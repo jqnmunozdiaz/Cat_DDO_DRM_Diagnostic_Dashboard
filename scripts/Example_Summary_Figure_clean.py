@@ -5,7 +5,6 @@ Creates a circular (polar) stacked bar chart visualizing DRM assessment data
 
 import numpy as np
 import pandas as pd
-import textwrap
 import matplotlib.pyplot as plt
 
 # =============================================================================
@@ -17,7 +16,6 @@ df_raw = pd.read_csv("data/DRM_system_assessment_template_filled_example.csv")
 
 # Remove completely empty rows
 df_raw = df_raw[df_raw["DRM Pillar"].notna() | df_raw["DRM sub-pillar"].notna()].copy()
-
 
 # Define the assessment category columns (these will be the stacked colors)
 # Retrieve value columns dynamically from the CSV, excluding known non-value columns
@@ -48,31 +46,8 @@ for col in value_cols:
 # Keep only needed columns
 df = df_raw[["individual", "group"] + value_cols].copy()
 
-# Merge 3.3.a and 3.3.b Sector-specific risk reduction measures
-# Check if both exist and average their values
-mask_3_3_a = df["individual"].str.contains("3.3.a", na=False, regex=False)
-mask_3_3_b = df["individual"].str.contains("3.3.b", na=False, regex=False)
-
-if mask_3_3_a.any() and mask_3_3_b.any():
-    # Get the rows for 3.3.a and 3.3.b
-    row_3_3_a = df[mask_3_3_a].copy()
-    row_3_3_b = df[mask_3_3_b].copy()
-    
-    # Average the value columns
-    for col in value_cols:
-        row_3_3_a[col] = (row_3_3_a[col].values + row_3_3_b[col].values) / 2
-    
-    # Update the label to remove .a
-    row_3_3_a["individual"] = row_3_3_a["individual"].str.replace("3.3.a", "3.3", regex=False)
-    
-    # Remove both 3.3.a and 3.3.b from df
-    df = df[~(mask_3_3_a | mask_3_3_b)].copy()
-    
-    # Add back the merged row
-    df = pd.concat([df, row_3_3_a], ignore_index=True)
-    
-    # Re-sort by group
-    df = df.sort_values(["group", "individual"]).reset_index(drop=True)
+# Re-sort by group
+df = df.sort_values(["group", "individual"]).reset_index(drop=True)
 
 # =============================================================================
 # 2. DATA RESHAPING FOR PLOTTING
@@ -115,10 +90,6 @@ number_of_groups = 6
 gap_width_ratio = 0.5  # Width of gap relative to bar width
 
 # Calculate bar width accounting for gaps
-# Total circle = bars + gaps
-# If we have n bars and g gaps, and gap = r * bar_width:
-# 2π = n * bar_width + g * r * bar_width
-# bar_width = 2π / (n + g * r)
 bar_width = 2 * np.pi / (number_of_bars + number_of_groups * gap_width_ratio)
 gap_width = gap_width_ratio * bar_width
 
