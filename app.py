@@ -8,7 +8,7 @@ from dash import dcc, html, Input, Output, State, callback
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.graph_objects as go
-from figure_generator import generate_figure
+from scripts.figure_generator import generate_figure
 import base64
 from io import BytesIO
 import os
@@ -115,6 +115,9 @@ app.layout = dbc.Container([
             html.Div([
                 html.H3("Section 2: Assessment Results", className="mb-4"),
                 
+                # Analysis text
+                html.Div(id="analysis-text", className="mb-4"),
+                
                 # Figure container
                 html.Div(
                     id="figure-container",
@@ -219,7 +222,8 @@ def generate_table(reset_confirm_clicks):
 @app.callback(
     [Output("results-section", "style"),
      Output("figure-store", "data"),
-     Output("figure-container", "children")],
+     Output("figure-container", "children"),
+     Output("analysis-text", "children")],
     Input("submit-button", "n_clicks"),
     State({"type": "value-input", "index": dash.ALL}, "id"),
     State({"type": "value-input", "index": dash.ALL}, "value"),
@@ -228,7 +232,7 @@ def generate_table(reset_confirm_clicks):
 def update_results(n_clicks, input_ids, input_values):
     """Process form data and generate figure"""
     if not input_ids:
-        return {"display": "none"}, None, "No data to process"
+        return {"display": "none"}, None, "No data to process", ""
     
     # Reconstruct the dataframe from inputs - start with empty table
     df = prepare_table_data(empty=True)
@@ -256,6 +260,62 @@ def update_results(n_clicks, input_ids, input_values):
                     except (ValueError, TypeError):
                         df.at[row_idx, col_name] = 0
     
+    # Analyze results - find areas below minimum standard (1.0)
+    below_minimum = []
+    
+    # Group by pillar and calculate total scores
+    df_analysis = df.copy()
+    df_analysis["DRM Pillar"] = template_df["DRM Pillar"].ffill()
+    df_analysis["DRM sub-pillar"] = template_df["DRM sub-pillar"]
+    
+    # Clean pillar names
+    df_analysis["DRM Pillar"] = df_analysis["DRM Pillar"].astype(str).str.replace(r'^\d+\.\s*', '', regex=True)
+    df_analysis["DRM sub-pillar"] = df_analysis["DRM sub-pillar"].astype(str).str.replace(r'^\d+\.?\d*\.?\s*', '', regex=True)
+    
+    for idx, row in df_analysis.iterrows():
+        # Calculate sum across value columns for this row
+        row_sum = sum([float(row[col]) if row[col] != "" and row[col] is not None else 0 for col in value_columns])
+        
+        if row_sum < 1.0:
+            pillar = row["DRM Pillar"]
+            subpillar = row["DRM sub-pillar"]
+            
+            # Determine what to display
+            if subpillar and subpillar not in ["nan", "-", ""]:
+                below_minimum.append(f"{pillar} - {subpillar}")
+            else:
+                below_minimum.append(pillar)
+    
+    # Generate analysis text
+    if below_minimum:
+        unique_areas = list(dict.fromkeys(below_minimum))  # Remove duplicates while preserving order
+        if len(unique_areas) == 1:
+            analysis_text = html.Div([
+                html.P([
+                    html.Strong("⚠️ Areas Below Minimum Standard:"),
+                    html.Br(),
+                    f"The following area does not meet the minimum standard (total score < 1): "
+                ], className="text-warning mb-2"),
+                html.Ul([html.Li(area) for area in unique_areas], className="mb-0")
+            ], className="alert alert-warning")
+        else:
+            analysis_text = html.Div([
+                html.P([
+                    html.Strong("⚠️ Areas Below Minimum Standard:"),
+                    html.Br(),
+                    f"The following {len(unique_areas)} areas do not meet the minimum standard (total score < 1): "
+                ], className="text-warning mb-2"),
+                html.Ul([html.Li(area) for area in unique_areas], className="mb-0")
+            ], className="alert alert-warning")
+    else:
+        analysis_text = html.Div([
+            html.P([
+                html.Strong("✓ All Areas Meet Minimum Standards"),
+                html.Br(),
+                "Congratulations! All assessed areas meet or exceed the minimum standard."
+            ], className="text-success mb-0")
+        ], className="alert alert-success")
+    
     # Generate figure
     try:
         img_str = generate_figure(df)
@@ -267,11 +327,11 @@ def update_results(n_clicks, input_ids, input_values):
             )
         ])
         
-        return {"display": "block"}, img_str, figure_html
+        return {"display": "block"}, img_str, figure_html, analysis_text
     except Exception as e:
         return {"display": "block"}, None, html.Div([
             html.Div(f"Error generating figure: {str(e)}", className="alert alert-danger")
-        ])
+        ]), ""
 
 # Callback for downloading the figure
 @app.callback(
