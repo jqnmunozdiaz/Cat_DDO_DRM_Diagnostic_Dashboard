@@ -1,0 +1,39 @@
+/* Chart Titles */
+.chart-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    margin-top: 0;
+}
+
+/* Explanatory text for charts */
+.chart-explanation {
+    font-size: 0.95rem;
+    color: #555555;
+    margin-bottom: 1.5rem;
+    margin-top: 0.5rem;
+    line-height: 1.65;
+    padding: 0.75rem 1rem 0.25rem 1rem;
+    background-color: #f0f7ff;
+    border-left: 3px solid #007bff;
+    border-radius: 3px;
+}
+
+/* Indicator Notes - Data source and methodology notes */
+
+.indicator-note-container {
+    margin-top: 12px;
+}
+
+.indicator-note {
+    font-style: italic;
+    font-size: 11.5px;
+    color: #666666;
+    margin: 12px 0 8px 0;
+    padding: 10px 12px;
+    background-color: #fafbfc;
+    border-left: 3px solid #a0aec0;
+    border-radius: 4px;
+    line-height: 1.35;
+}

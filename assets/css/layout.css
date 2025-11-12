@@ -1,0 +1,101 @@
+/* Layout Components - Dashboard structure and containers */
+
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #f9fafb;
+    overflow: hidden;
+}
+
+.header-container {
+    background: white;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.header-inner {
+    display: flex;
+    align-items: center;
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.header-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #295e84;
+    margin: 0;
+}
+
+.header-title-container {
+    display: flex;
+    align-items: center;
+}
+
+.header-spacer {
+    flex: 1;
+}
+
+.header-logos {
+    display: flex;
+    align-items: center;
+}
+
+.header-logo {
+    height: 40px;
+    filter: brightness(0.8);
+}
+
+.header-logo-wb {
+    margin-right: 0.75rem;
+}
+
+.main-content {
+    flex: 1 1 0%;
+    overflow-y: auto;
+}
+
+.content-area {
+    flex: 1 1 0%;
+}
+
+.tab-content-container {
+    background: #f9fafb;
+    min-height: calc(100vh - 300px);
+}
+
+.tab-content-inner {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.chart-container {
+    background: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+}
+
+.coming-soon-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.coming-soon-text {
+    font-size: 1.125rem;
+    color: #9ca3af;
+    text-align: center;
+    padding: 2rem;
+}

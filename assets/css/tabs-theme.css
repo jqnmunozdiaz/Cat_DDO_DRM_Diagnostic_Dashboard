@@ -1,0 +1,97 @@
+/* Tab Color Themes - Class-based styling for easy customization */
+
+/* ============================================
+   BLUE THEME - Urban indicators, National data
+   ============================================ */
+
+.tab-blue {
+    background: #e0f2fe !important;
+    border-color: #0ea5e9 !important;
+    color: #0c4a6e !important;
+}
+
+.tab-blue:hover {
+    background: #bae6fd !important;
+    border-color: #0284c7 !important;
+    color: #082f49 !important;
+}
+
+.tab-blue.active {
+    color: #0c4a6e !important;
+    background: #7dd3fc !important;
+    border-color: #0284c7 !important;
+    font-weight: 500 !important;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25) !important;
+}
+
+/* ============================================
+   GREEN THEME - Services & infrastructure
+   ============================================ */
+
+.tab-green {
+    background: #dcfce7 !important;
+    border-color: #22c55e !important;
+    color: #166534 !important;
+}
+
+.tab-green:hover {
+    background: #bbf7d0 !important;
+    border-color: #16a34a !important;
+    color: #14532d !important;
+}
+
+.tab-green.active {
+    color: #166534 !important;
+    background: #86efac !important;
+    border-color: #16a34a !important;
+    font-weight: 500 !important;
+    box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25) !important;
+}
+
+/* ============================================
+   ORANGE THEME - City-level data
+   ============================================ */
+
+.tab-orange {
+    background: #fed7aa !important;
+    border-color: #fb923c !important;
+    color: #7c2d12 !important;
+}
+
+.tab-orange:hover {
+    background: #fdba74 !important;
+    border-color: #f97316 !important;
+    color: #6b1f00 !important;
+}
+
+.tab-orange.active {
+    color: #7c2d12 !important;
+    background: #fb923c !important;
+    border-color: #f97316 !important;
+    font-weight: 500 !important;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25) !important;
+}
+
+/* ============================================
+   GRAY THEME - Overview/General info
+   ============================================ */
+
+.tab-gray {
+    background: #f3f4f6 !important;
+    border-color: #9ca3af !important;
+    color: #374151 !important;
+}
+
+.tab-gray:hover {
+    background: #e5e7eb !important;
+    border-color: #6b7280 !important;
+    color: #1f2937 !important;
+}
+
+.tab-gray.active {
+    color: #1f2937 !important;
+    background: #d1d5db !important;
+    border-color: #6b7280 !important;
+    font-weight: 500 !important;
+    box-shadow: 0 2px 8px rgba(107, 114, 128, 0.25) !important;
+}

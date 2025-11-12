@@ -1,0 +1,58 @@
+/* Slider Styles - Year selector slider component */
+
+.filter-container .rc-slider {
+    margin: 0;
+    padding: 0.45rem 0.25rem;
+    min-height: 36px;
+    flex: 1 1 auto;
+    min-width: 600px;
+}
+
+.rc-slider-rail {
+    background-color: #e5e7eb;
+    height: 6px;
+    border-radius: 3px;
+}
+
+.rc-slider-track {
+    background-color: #295e84;
+    height: 6px;
+    border-radius: 3px;
+}
+
+.rc-slider-handle {
+    border: 3px solid #295e84;
+    background-color: white;
+    width: 18px;
+    height: 18px;
+    margin-top: -6px;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.rc-slider-handle:hover,
+.rc-slider-handle:active,
+.rc-slider-handle:focus {
+    border-color: #1e4a66;
+}
+
+.rc-slider-mark {
+    top: 10px;
+}
+
+.rc-slider-mark-text {
+    font-size: 0.75rem;
+    color: #374151;
+    font-weight: 500;
+    margin-top: 6px;
+    white-space: nowrap;
+}
+
+.rc-slider-mark-text-active {
+    color: #295e84;
+    font-weight: 600;
+}
+
+.rc-slider-dot {
+    display: none;
+}

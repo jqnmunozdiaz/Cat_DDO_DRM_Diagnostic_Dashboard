@@ -1,0 +1,51 @@
+/* Responsive Design - Mobile and tablet breakpoints */
+
+@media (max-width: 768px) {
+    .main-nav-tabs .nav-link {
+        padding: 0.75rem 1.25rem !important;
+        font-size: 0.875rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .sub-nav-tabs .nav-link {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* Responsive slider */
+    .filter-container {
+        display: block;
+    }
+    
+    .filter-container .filter-label {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-container .rc-slider {
+        min-width: 100%;
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .main-nav-tabs {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+
+    .main-nav-tabs .nav-link {
+        min-width: 200px !important;
+        text-align: center !important;
+        margin-right: 0 !important;
+    }
+
+    .sub-nav-tabs {
+        flex-direction: column !important;
+    }
+
+    .sub-nav-tabs .nav-link {
+        width: 100% !important;
+        margin-bottom: 0.25rem !important;
+    }
+}

@@ -1,0 +1,98 @@
+/* Buttons - Download buttons and other action buttons */
+
+.download-button-container {
+    margin-top: 0rem;
+    display: inline-flex;
+    justify-content: flex-end;
+}
+
+/* Main body top-right action area */
+.main-action-topright {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0.5rem 1.5rem;
+}
+
+.main-action-topright-inner {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Global fixed top-right action button (overlaps header/logo if needed) */
+.global-topright-action {
+    position: fixed;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    pointer-events: auto;
+}
+
+.global-topright-action .download-data-button {
+    padding: 0.6rem 1.05rem !important;
+    font-size: 0.9rem !important;
+    border-radius: 8px !important;
+}
+
+/* Ensure hero map action uses same button sizing */
+.hero-map-action .download-data-button {
+    padding: 0.5rem 0.9rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* Container for multiple buttons (Download + Methodological Note) */
+.buttons-container {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* Remove hyperlink formatting from buttons inside links */
+.download-button-container a,
+.buttons-container a,
+.hero-map-action a {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+.download-button-container a:hover,
+.buttons-container a:hover,
+.hero-map-action a:hover {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+.download-data-button {
+    background-color: #295e84 !important;
+    border-color: #295e84 !important;
+    color: white !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.download-data-button:hover {
+    background-color: #1e4a66 !important;
+    border-color: #1e4a66 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.download-data-button:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.download-data-button i {
+    font-size: 0.875rem;
+}

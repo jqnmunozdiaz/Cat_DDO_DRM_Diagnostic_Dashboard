@@ -1,0 +1,254 @@
+/* Benchmark Selectors - Regional and country benchmark components */
+
+/* Benchmark Selector Styles */
+.benchmark-selector-container {
+    background: #f8fafc;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.checkbox-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.benchmark-checkboxes {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.benchmark-checkboxes .form-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.benchmark-checkboxes input[type="checkbox"] {
+    width: 1rem !important;
+    height: 1rem !important;
+    margin-right: 0.5rem !important;
+    border: 2px solid #d1d5db !important;
+    border-radius: 0.25rem !important;
+    vertical-align: middle;
+    margin: 0 0.5rem 0 0 !important;
+    background: white !important;
+}
+
+.benchmark-checkboxes input[type="checkbox"]:checked {
+    background-color: #295e84 !important;
+    border-color: #295e84 !important;
+}
+
+.benchmark-checkboxes input[type="checkbox"]:focus {
+    box-shadow: 0 0 0 2px rgba(41, 94, 132, 0.2) !important;
+}
+
+.benchmark-checkboxes label {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: #374151 !important;
+    margin-bottom: 0 !important;
+    cursor: pointer;
+}
+
+/* Country Benchmark Selector Styles */
+.country-benchmark-selector-container {
+    background: #ffffff;
+    padding: 0rem;
+    border-radius: 0.5rem;
+    border: 0px solid #e2e8f0;
+    margin-bottom: 0rem !important; /* removed extra space below selector to eliminate gap */
+    padding-bottom: 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.dropdown-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0;
+    white-space: nowrap;
+    min-width: fit-content;
+}
+
+.dropdown-group {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.country-benchmark-dropdown {
+    min-height: 28px;
+    min-width: 400px;
+}
+
+.country-benchmark-dropdown .Select__control {
+    border: 1px solid #d1d5db !important;
+    border-radius: 0.375rem !important;
+    background: white !important;
+    min-height: 38px !important;
+    box-shadow: none !important;
+    font-size: 0.875rem !important;
+}
+
+.country-benchmark-dropdown .Select__control:hover {
+    border-color: #9ca3af !important;
+}
+
+.country-benchmark-dropdown .Select__control--is-focused {
+    border-color: #295e84 !important;
+    box-shadow: 0 0 0 1px #295e84 !important;
+}
+
+.country-benchmark-dropdown .Select__placeholder {
+    color: #9ca3af !important;
+    font-size: 0.875rem !important;
+}
+
+.country-benchmark-dropdown .Select__multi-value {
+    background-color: #e0f2fe !important;
+    border-radius: 0.25rem !important;
+}
+
+.country-benchmark-dropdown .Select__multi-value__label {
+    color: #0f172a !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+}
+
+.country-benchmark-dropdown .Select__multi-value__remove {
+    color: #64748b !important;
+    cursor: pointer !important;
+}
+
+.country-benchmark-dropdown .Select__multi-value__remove:hover {
+    background-color: #ef4444 !important;
+    color: white !important;
+}
+
+.country-benchmark-dropdown .Select__menu {
+    border-radius: 0.375rem !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.country-benchmark-dropdown .Select__option {
+    font-size: 0.875rem !important;
+    padding: 0.5rem 0.75rem !important;
+}
+
+.country-benchmark-dropdown .Select__option--is-focused {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+
+.country-benchmark-dropdown .Select__option--is-selected {
+    background-color: #295e84 !important;
+    color: white !important;
+}
+
+/* City Selector Styles - Matches country benchmark styling */
+.city-selector-container {
+    background: #ffffff;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 0px solid #e2e8f0;
+    margin-bottom: 0rem !important;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.city-selector-container .dropdown-label {
+    flex-shrink: 0;
+    margin-bottom: 0;
+}
+
+.city-dropdown {
+    min-height: 28px;
+    min-width: 400px;
+}
+
+.city-dropdown .Select__control {
+    border: 1px solid #d1d5db !important;
+    border-radius: 0.375rem !important;
+    background: white !important;
+    min-height: 38px !important;
+    box-shadow: none !important;
+    font-size: 0.875rem !important;
+}
+
+.city-dropdown .Select__control:hover {
+    border-color: #9ca3af !important;
+}
+
+.city-dropdown .Select__control--is-focused {
+    border-color: #295e84 !important;
+    box-shadow: 0 0 0 1px #295e84 !important;
+}
+
+.city-dropdown .Select__placeholder {
+    color: #9ca3af !important;
+    font-size: 0.875rem !important;
+}
+
+.city-dropdown .Select__multi-value {
+    background-color: #e0f2fe !important;
+    border-radius: 0.25rem !important;
+}
+
+.city-dropdown .Select__multi-value__label {
+    color: #0f172a !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+}
+
+.city-dropdown .Select__multi-value__remove {
+    color: #64748b !important;
+    cursor: pointer !important;
+}
+
+.city-dropdown .Select__multi-value__remove:hover {
+    background-color: #ef4444 !important;
+    color: white !important;
+}
+
+.city-dropdown .Select__menu {
+    border-radius: 0.375rem !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.city-dropdown .Select__option {
+    font-size: 0.875rem !important;
+    padding: 0.5rem 0.75rem !important;
+}
+
+.city-dropdown .Select__option--is-focused {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+
+.city-dropdown .Select__option--is-selected {
+    background-color: #295e84 !important;
+    color: white !important;
+}
+
