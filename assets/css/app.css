@@ -122,3 +122,13 @@ input[type="number"] {
     color: #999;
     font-size: 0.85rem;
 }
+
+/* Highlight invalid inputs */
+.form-control-sm.invalid {
+    border-color: #dc3545 !important;
+    background-color: #fff5f5;
+}
+
+.form-control-sm.invalid:focus {
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}

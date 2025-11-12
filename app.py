@@ -160,6 +160,20 @@ def generate_table(reset_confirm_clicks):
     else:
         df = prepare_table_data(empty=True)
     
+    # Clean the dataframe for display
+    df_clean = df.copy()
+    
+    # Remove leading numbers (e.g., "1. ", "2.1. ") from pillar and sub-pillar names
+    df_clean["DRM Pillar"] = df_clean["DRM Pillar"].astype(str).str.replace(r'^\d+\.\s*', '', regex=True)
+    df_clean["DRM sub-pillar"] = df_clean["DRM sub-pillar"].astype(str).str.replace(r'^\d+\.?\d*\.?\s*', '', regex=True)
+    
+    # Forward fill pillar names to replace "nan" with the actual pillar
+    df_clean["DRM Pillar"] = df_clean["DRM Pillar"].replace("nan", "").replace("", pd.NA)
+    df_clean["DRM Pillar"] = df_clean["DRM Pillar"].ffill()
+    
+    # Replace "nan" and "-" in sub-pillars with empty string
+    df_clean["DRM sub-pillar"] = df_clean["DRM sub-pillar"].replace(["nan", "-"], "")
+    
     # Create table
     table = dbc.Table(
         [
@@ -172,20 +186,24 @@ def generate_table(reset_confirm_clicks):
             ),
             html.Tbody([
                 html.Tr([
-                    html.Td(str(row["DRM Pillar"]), className="pillar-cell"),
-                    html.Td(str(row["DRM sub-pillar"]), className="subpillar-cell"),
+                    html.Td(str(row["DRM Pillar"]) if pd.notna(row["DRM Pillar"]) else "", className="pillar-cell"),
+                    html.Td(str(row["DRM sub-pillar"]) if row["DRM sub-pillar"] != "" else "", className="subpillar-cell"),
                     *[
                         html.Td(
                             dbc.Input(
-                                type="text",
+                                type="number",
+                                step=0.01,
+                                min=0,
+                                max=1,
                                 value=row[col] if row[col] != "" else None,
                                 id={"type": "value-input", "index": f"{idx}-{col}"},
                                 className="form-control-sm",
-                                placeholder=""
+                                placeholder="",
+                                debounce=True
                             )
                         ) for col in value_columns
                     ]
-                ]) for idx, (_, row) in enumerate(df.iterrows())
+                ]) for idx, (_, row) in enumerate(df_clean.iterrows())
             ])
         ],
         bordered=True,
@@ -299,7 +317,11 @@ def toggle_reset_modal(reset_clicks, cancel_clicks, confirm_clicks, is_open):
     
     return is_open
 
-# Add custom CSS
+
+
+
+
+# Add validation script
 app.index_string = '''
 <!DOCTYPE html>
 <html>
@@ -315,9 +337,31 @@ app.index_string = '''
         {%config%}
         {%scripts%}
         {%renderer%}
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function validateInputs() {
+                document.querySelectorAll('input[type="number"]').forEach(input => {
+                    input.addEventListener('change', function() {
+                        let val = parseFloat(this.value);
+                        if (!isNaN(val)) {
+                            if (val < 0) this.value = 0;
+                            if (val > 1) this.value = 1;
+                        }
+                    });
+                });
+            }
+            validateInputs();
+            // Re-run after Dash updates
+            const observer = new MutationObserver(validateInputs);
+            observer.observe(document.body, { childList: true, subtree: true });
+        });
+        </script>
     </body>
 </html>
 '''
 
 if __name__ == '__main__':
-    app.run(debug=False, port=int(os.environ.get("PORT", 8050)))
+    # Use debug=True for development (auto-reload on code changes)
+    # Set to False for production deployment
+    is_production = os.environ.get("RENDER", False)
+    app.run(debug=not is_production, port=int(os.environ.get("PORT", 8050)))
