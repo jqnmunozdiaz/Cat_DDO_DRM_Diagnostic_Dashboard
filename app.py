@@ -12,6 +12,7 @@ from figure_generator import generate_figure
 import base64
 from io import BytesIO
 import os
+import numpy as np
 
 # Initialize the Dash app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -24,13 +25,20 @@ template_df = pd.read_csv("data/DRM_system_assessment_template_filled_example.cs
 value_columns = [col for col in template_df.columns if col not in ["DRM Pillar", "DRM sub-pillar"]]
 
 # Prepare table data - create editable version with only value columns
-def prepare_table_data(empty=False):
+def prepare_table_data(empty=False, random_values=False):
     """Prepare table data for the input form"""
     df = template_df.copy()
     if empty:
         # Clear all value columns
         for col in value_columns:
             df[col] = ""
+    elif random_values:
+        # Fill with random values between 0 and 1
+        np.random.seed(42)  # For reproducibility
+        for col in value_columns:
+            # Generate random values, with some being 0 (empty) for variety
+            random_vals = np.random.choice([0, np.random.uniform(0, 1)], size=len(df), p=[0.2, 0.8])
+            df[col] = [round(val, 2) if val > 0 else "" for val in random_vals]
     else:
         # Replace "-" with empty string for display
         for col in value_columns:
@@ -139,22 +147,18 @@ app.layout = dbc.Container([
 # Callback to generate and update the table
 @app.callback(
     Output("table-container", "children"),
-    Input("submit-button", "n_clicks"),
     Input("reset-confirm", "n_clicks"),
     prevent_initial_call=False
 )
-def generate_table(submit_clicks, reset_confirm_clicks):
+def generate_table(reset_confirm_clicks):
     """Generate the editable table from template"""
-    # Determine if we should show empty table (on reset or initial load)
     ctx = dash.callback_context
-    show_empty = True
     
-    if ctx.triggered:
-        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
-        if button_id == "submit-button" and submit_clicks:
-            show_empty = False
-    
-    df = prepare_table_data(empty=show_empty)
+    # On initial load, show random values; on reset, show empty table
+    if not ctx.triggered or ctx.triggered[0]["prop_id"] == ".":
+        df = prepare_table_data(random_values=True)
+    else:
+        df = prepare_table_data(empty=True)
     
     # Create table
     table = dbc.Table(

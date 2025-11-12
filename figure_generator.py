@@ -3,6 +3,9 @@ Figure Generator for DRM System Assessment
 Converts input dataframe to PNG figure (base64 encoded)
 """
 
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend for web applications
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt

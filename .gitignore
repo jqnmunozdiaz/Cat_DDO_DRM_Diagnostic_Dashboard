@@ -129,7 +129,9 @@ dmypy.json
 .DS_Store
 Thumbs.db
 
-# Application specific
-*.png
-*.jpg
+# Application specific - generated files only
 DRM_Assessment_Chart.png
+
+# But keep assets (logos, etc.)
+!assets/**/*.png
+!assets/**/*.jpg
