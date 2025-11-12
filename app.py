@@ -139,7 +139,15 @@ app.layout = dbc.Container([
             # Section 1: Input Form
             html.Div([
                 html.H3("Section 1: Assessment Data", className="mb-4"),
-
+                
+                # Download template button
+                dbc.Row([
+                    dbc.Col([
+                        dbc.Button("Download Diagnostic Questionnaire", id="download-template-button", color="info", outline=True, className="mb-3"),
+                        dcc.Download(id="download-template")
+                    ], width=12)
+                ]),
+                
                 # Paste area to bulk-populate the table
                 html.Div([
                     html.Label("Please paste the data from cell D7 of your spreadsheet after completing the diagnostic:", className="form-label fw-semibold"),
@@ -177,11 +185,19 @@ app.layout = dbc.Container([
                 ], className="mb-4"),
                 # Table container (hidden from view, inputs still available to callbacks)
                 html.Div(id="table-container", className="table-responsive", style={"display": "none"}),
-            ], className="section-1 p-4 mb-5 border rounded bg-light"),
+            ], id="section-1", className="section-1 p-4 mb-5 border rounded bg-light"),
 
             # Section 2: Results (hidden initially)
             html.Div([
-                html.H3("Section 2: Assessment Results", className="mb-4"),
+                # Title with Back button on the right
+                dbc.Row([
+                    dbc.Col([
+                        html.H3("Section 2: Assessment Results", className="mb-0")
+                    ], width="auto"),
+                    dbc.Col([
+                        dbc.Button("Back", id="back-button", color="secondary", outline=True, size="sm")
+                    ], width="auto", className="ms-auto")
+                ], align="center", className="mb-4"),
                 
                 # Contextual information
                 html.Div([
@@ -343,7 +359,8 @@ def generate_table(pasted_data):
 
 # Callback to generate results on paste or See Results button
 @app.callback(
-    [Output("results-section", "style"),
+    [Output("section-1", "style"),
+     Output("results-section", "style"),
      Output("figure-store", "data"),
      Output("figure-container", "children"),
      Output("analysis-text", "children")],
@@ -440,9 +457,9 @@ def update_results(n_clicks, pasted_data):
             )
         ])
         
-        return {"display": "block"}, img_str, figure_html, analysis_text
+        return {"display": "none"}, {"display": "block"}, img_str, figure_html, analysis_text
     except Exception as e:
-        return {"display": "block"}, None, html.Div([
+        return {"display": "none"}, {"display": "block"}, None, html.Div([
             html.Div(f"Error generating figure: {str(e)}", className="alert alert-danger")
         ]), ""
 
@@ -477,45 +494,29 @@ def toggle_example(n_clicks, is_open):
     """Toggle the example data collapse"""
     return not is_open
 
+# Callback to handle Back button - return to Section 1 and clear data
+@app.callback(
+    [Output("section-1", "style", allow_duplicate=True),
+     Output("results-section", "style", allow_duplicate=True),
+     Output("pasted-data", "data", allow_duplicate=True),
+     Output("paste-input", "value")],
+    Input("back-button", "n_clicks"),
+    prevent_initial_call=True
+)
+def go_back(n_clicks):
+    """Return to Section 1 and clear pasted data"""
+    return {"display": "block"}, {"display": "none"}, None, ""
 
-# Add validation script
-app.index_string = '''
-<!DOCTYPE html>
-<html>
-    <head>
-        {%metas%}
-        <title>{%title%}</title>
-        {%favicon%}
-        {%css%}
-    </head>
-    <body>
-        {%app_entry%}
-        <footer></footer>
-        {%config%}
-        {%scripts%}
-        {%renderer%}
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            function validateInputs() {
-                document.querySelectorAll('input[type="number"]').forEach(input => {
-                    input.addEventListener('change', function() {
-                        let val = parseFloat(this.value);
-                        if (!isNaN(val)) {
-                            if (val < 0) this.value = 0;
-                            if (val > 1) this.value = 1;
-                        }
-                    });
-                });
-            }
-            validateInputs();
-            // Re-run after Dash updates
-            const observer = new MutationObserver(validateInputs);
-            observer.observe(document.body, { childList: true, subtree: true });
-        });
-        </script>
-    </body>
-</html>
-'''
+# Callback to download template file
+@app.callback(
+    Output("download-template", "data"),
+    Input("download-template-button", "n_clicks"),
+    prevent_initial_call=True
+)
+def download_template(n_clicks):
+    """Download the DRM System Diagnostic Assessment Template"""
+    return dcc.send_file("data/DRM System Diagnostic Assessment - Template.xlsx")
+
 
 if __name__ == '__main__':
     # Use debug=True for development (auto-reload on code changes)
