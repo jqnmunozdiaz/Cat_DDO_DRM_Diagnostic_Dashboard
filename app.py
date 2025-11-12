@@ -17,27 +17,42 @@ import os
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
-# Load the template CSV to get structure
+    # Load the template CSV to get structure
 template_df = pd.read_csv("data/DRM_system_assessment_template_filled_example.csv")
 
 # Extract value columns (all columns except DRM Pillar and DRM sub-pillar)
 value_columns = [col for col in template_df.columns if col not in ["DRM Pillar", "DRM sub-pillar"]]
 
 # Prepare table data - create editable version with only value columns
-def prepare_table_data():
+def prepare_table_data(empty=False):
     """Prepare table data for the input form"""
     df = template_df.copy()
-    # Replace "-" with empty string for display
-    for col in value_columns:
-        df[col] = df[col].astype(str).replace("-", "").replace("nan", "")
+    if empty:
+        # Clear all value columns
+        for col in value_columns:
+            df[col] = ""
+    else:
+        # Replace "-" with empty string for display
+        for col in value_columns:
+            df[col] = df[col].astype(str).replace("-", "").replace("nan", "")
     return df
 
 # App layout
 app.layout = dbc.Container([
+    # Header with logos
+    dbc.Row([
+        dbc.Col([
+            html.Div([
+                html.Img(src="/assets/images/wb-full-logo.png", height="60px", className="me-3"),
+                html.Img(src="/assets/images/gfdrr-logo.png", height="60px")
+            ], style={"display": "flex", "alignItems": "center", "justifyContent": "center", "marginBottom": "20px", "gap": "20px"})
+        ], width=12)
+    ]),
+    
     # Header
     dbc.Row([
         dbc.Col([
-            html.H1("DRM Diagnostic Assessment Tool", className="mb-2 mt-5 text-center"),
+            html.H1("DRM Diagnostic Assessment Tool", className="mb-2 text-center"),
             html.P(
                 "Evaluate your country's institutional setting for Disaster Risk Management across six critical pillars.",
                 className="text-center text-muted mb-4 lead"
@@ -51,12 +66,12 @@ app.layout = dbc.Container([
             # Section 1: Input Form
             html.Div([
                 html.H3("Section 1: Assessment Data", className="mb-4"),
-                html.P("Fill in the assessment values for each DRM component. Leave blank or enter 0 for not applicable (-).", className="text-muted"),
+                html.P("Fill in the assessment values for each DRM component with a value between 0 and 1.", className="text-muted"),
                 
                 # Table container
                 html.Div(id="table-container", className="table-responsive"),
                 
-                # See Results button
+                # Buttons
                 dbc.Row([
                     dbc.Col([
                         dbc.Button(
@@ -64,11 +79,29 @@ app.layout = dbc.Container([
                             id="submit-button",
                             color="primary",
                             size="lg",
-                            className="mt-4 w-100"
+                            className="mt-4 me-2"
+                        ),
+                        dbc.Button(
+                            "Reset",
+                            id="reset-button",
+                            color="secondary",
+                            outline=True,
+                            size="lg",
+                            className="mt-4"
                         )
                     ], width=12)
                 ]),
             ], className="section-1 p-4 mb-5 border rounded bg-light"),
+            
+            # Confirmation Modal for Reset
+            dbc.Modal([
+                dbc.ModalHeader(dbc.ModalTitle("Confirm Reset")),
+                dbc.ModalBody("Are you sure you want to clear all values? This action cannot be undone."),
+                dbc.ModalFooter([
+                    dbc.Button("No", id="reset-cancel", className="me-2"),
+                    dbc.Button("Yes", id="reset-confirm", color="danger")
+                ])
+            ], id="reset-modal", centered=True),
             
             # Section 2: Results (hidden initially)
             html.Div([
@@ -107,20 +140,30 @@ app.layout = dbc.Container([
 @app.callback(
     Output("table-container", "children"),
     Input("submit-button", "n_clicks"),
-    prevent_initial_call=True
+    Input("reset-confirm", "n_clicks"),
+    prevent_initial_call=False
 )
-def generate_table(n_clicks):
+def generate_table(submit_clicks, reset_confirm_clicks):
     """Generate the editable table from template"""
-    df = prepare_table_data()
+    # Determine if we should show empty table (on reset or initial load)
+    ctx = dash.callback_context
+    show_empty = True
+    
+    if ctx.triggered:
+        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if button_id == "submit-button" and submit_clicks:
+            show_empty = False
+    
+    df = prepare_table_data(empty=show_empty)
     
     # Create table
     table = dbc.Table(
         [
             html.Thead(
                 html.Tr([
-                    html.Th("DRM Pillar", width="20%"),
-                    html.Th("DRM Sub-pillar", width="25%"),
-                    *[html.Th(col, width=f"{55/len(value_columns):.1f}%") for col in value_columns]
+                    html.Th("DRM Pillar", style={"width": "20%"}),
+                    html.Th("DRM Sub-pillar", style={"width": "25%"}),
+                    *[html.Th(col, style={"width": f"{55/len(value_columns):.1f}%"}) for col in value_columns]
                 ])
             ),
             html.Tbody([
@@ -130,13 +173,11 @@ def generate_table(n_clicks):
                     *[
                         html.Td(
                             dbc.Input(
-                                type="number",
-                                step=0.01,
-                                min=0,
-                                max=1,
+                                type="text",
                                 value=row[col] if row[col] != "" else None,
                                 id={"type": "value-input", "index": f"{idx}-{col}"},
-                                className="form-control-sm"
+                                className="form-control-sm",
+                                placeholder=""
                             )
                         ) for col in value_columns
                     ]
@@ -167,23 +208,31 @@ def update_results(n_clicks, input_ids, input_values):
     if not input_ids:
         return {"display": "none"}, None, "No data to process"
     
-    # Reconstruct the dataframe from inputs
-    df = prepare_table_data()
+    # Reconstruct the dataframe from inputs - start with empty table
+    df = prepare_table_data(empty=True)
     
     # Create a mapping of row-column to value
     for i, (input_id, value) in enumerate(zip(input_ids, input_values)):
         row_col = input_id["index"]
-        parts = row_col.rsplit("-", 1)
+        # Split by first dash only to get row index
+        parts = row_col.split("-", 1)
         if len(parts) == 2:
             row_idx = int(parts[0])
-            col_name = "-".join(parts[1:])  # In case column has "-" in name
+            col_name = parts[1]  # The column name as stored in the ID
             
-            # Find the actual column name
-            for col in value_columns:
-                if col.replace(" ", "-") in row_col or row_col.endswith(col.replace(" ", "-")):
-                    if row_idx < len(df):
-                        df.at[row_idx, col] = value if value is not None else 0
-                    break
+            # Match with actual column name
+            if col_name in value_columns and row_idx < len(df):
+                # Validate and convert value
+                if value is None or value == "":
+                    df.at[row_idx, col_name] = 0
+                else:
+                    try:
+                        num_value = float(value)
+                        # Clamp value between 0 and 1
+                        num_value = max(0, min(1, num_value))
+                        df.at[row_idx, col_name] = num_value
+                    except (ValueError, TypeError):
+                        df.at[row_idx, col_name] = 0
     
     # Generate figure
     try:
@@ -222,6 +271,30 @@ def download_figure(n_clicks, img_data):
         filename="DRM_Assessment_Result.png"
     )
 
+# Callback to open reset confirmation modal
+@app.callback(
+    Output("reset-modal", "is_open"),
+    Input("reset-button", "n_clicks"),
+    Input("reset-cancel", "n_clicks"),
+    Input("reset-confirm", "n_clicks"),
+    State("reset-modal", "is_open"),
+    prevent_initial_call=True
+)
+def toggle_reset_modal(reset_clicks, cancel_clicks, confirm_clicks, is_open):
+    """Toggle the reset confirmation modal"""
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        return is_open
+    
+    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    
+    if button_id == "reset-button":
+        return True
+    elif button_id in ["reset-cancel", "reset-confirm"]:
+        return False
+    
+    return is_open
+
 # Add custom CSS
 app.index_string = '''
 <!DOCTYPE html>
@@ -231,97 +304,6 @@ app.index_string = '''
         <title>{%title%}</title>
         {%favicon%}
         {%css%}
-        <style>
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-                padding: 20px 0;
-            }
-            .container-fluid, .container {
-                background-color: white;
-                border-radius: 10px;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-                margin-top: 20px;
-                margin-bottom: 40px;
-            }
-            h1 {
-                color: #667eea;
-                font-weight: 700;
-            }
-            h3 {
-                color: #764ba2;
-                font-weight: 600;
-                margin-top: 30px;
-            }
-            .section-1, .section-2 {
-                background-color: #f8f9fa;
-                border-color: #dee2e6 !important;
-            }
-            .table {
-                margin-bottom: 0;
-            }
-            .table th {
-                background-color: #667eea;
-                color: white;
-                font-weight: 600;
-                border: none;
-                text-align: center;
-            }
-            .table td {
-                vertical-align: middle;
-                border-color: #dee2e6;
-            }
-            .pillar-cell, .subpillar-cell {
-                font-weight: 500;
-                background-color: #f0f0f0;
-                color: #333;
-            }
-            .form-control-sm {
-                border: 1px solid #ccc;
-                padding: 6px 8px;
-                font-size: 0.9rem;
-            }
-            .form-control-sm:focus {
-                border-color: #667eea;
-                box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-            }
-            .btn {
-                border-radius: 6px;
-                font-weight: 600;
-                transition: all 0.3s ease;
-            }
-            .btn-primary {
-                background-color: #667eea;
-                border-color: #667eea;
-            }
-            .btn-primary:hover {
-                background-color: #5568d3;
-                border-color: #5568d3;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-            }
-            .btn-success {
-                border-color: #28a745;
-                color: #28a745;
-            }
-            .btn-success:hover {
-                background-color: #28a745;
-                color: white;
-            }
-            .text-muted {
-                color: #6c757d !important;
-                font-size: 0.95rem;
-            }
-            .lead {
-                font-size: 1.1rem;
-                font-weight: 500;
-            }
-            .table-responsive {
-                border-radius: 6px;
-                overflow: hidden;
-            }
-        </style>
     </head>
     <body>
         {%app_entry%}
