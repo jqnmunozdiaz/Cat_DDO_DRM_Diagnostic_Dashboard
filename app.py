@@ -4,21 +4,21 @@ Simple one-page dashboard for evaluating country's institutional setting for DRM
 """
 
 import dash
-from dash import dcc, html, Input, Output, State, callback
+from dash import dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.graph_objects as go
 from scripts.figure_generator import generate_figure
 import base64
-from io import BytesIO
 import os
 import numpy as np
+import re
 
 # Initialize the Dash app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
-    # Load the template CSV to get structure
+# Load the template CSV to get structure
 template_df = pd.read_csv("data/DRM_system_assessment_template_filled_example.csv")
 
 # Extract value columns (all columns except DRM Pillar and DRM sub-pillar)
@@ -45,6 +45,66 @@ def prepare_table_data(empty=False, random_values=False):
             df[col] = df[col].astype(str).replace("-", "").replace("nan", "")
     return df
 
+def parse_pasted_data(raw_text: str):
+    """Parse semicolon-separated rows with comma-separated columns.
+    Returns dataframe aligned to template columns or None if invalid.
+    Expected header must include the value column names matching template.
+    """
+    if not raw_text or raw_text.strip() == "":
+        return None, "No data provided"
+    # Split rows by semicolon
+    rows = [r.strip() for r in raw_text.split(";") if r.strip()]
+    if len(rows) < 2:
+        return None, "Not enough rows (need header + at least one data row)"
+    header = rows[0].split(",")
+    # Normalize header spacing
+    header = [h.strip() for h in header]
+    required_first_two = ["Pillar", "Subpillar"]
+    if header[0:2] != required_first_two:
+        return None, "Header must start with 'Pillar,Subpillar'"
+    # Map remaining headers to template value columns by approximate match
+    template_map = {}
+    remaining_headers = header[2:]
+    # Build a lowercase simplified map of template value columns
+    simplified_template = {re.sub(r'[^a-z0-9]', '', c.lower()): c for c in value_columns}
+    for h in remaining_headers:
+        key = re.sub(r'[^a-z0-9]', '', h.lower())
+        if key in simplified_template:
+            template_map[h] = simplified_template[key]
+        else:
+            return None, f"Unrecognized header column: {h}"
+    # Ensure all template value columns are present (strict)
+    if set(template_map.values()) != set(value_columns):
+        return None, "Header value columns do not match required template columns"
+    # Parse data rows
+    data_records = []
+    for r in rows[1:]:
+        cols = [c.strip() for c in r.split(",")]
+        if len(cols) != len(header):
+            return None, f"Row has {len(cols)} columns, expected {len(header)}: {r}"
+        record = {
+            "DRM Pillar": cols[0],
+            "DRM sub-pillar": cols[1]
+        }
+        # Map each remaining value
+        for original_header, raw_val in zip(remaining_headers, cols[2:]):
+            target_col = template_map[original_header]
+            v = raw_val.strip()
+            if v == "" or v.lower() in ["na", "nan", "-"]:
+                record[target_col] = ""
+            else:
+                try:
+                    num = float(v)
+                    # Clamp 0-1
+                    num = max(0, min(1, num))
+                    record[target_col] = num
+                except ValueError:
+                    record[target_col] = ""
+        data_records.append(record)
+    # Build dataframe
+    df = pd.DataFrame(data_records)
+    return df, "Parsed successfully"
+
 # App layout
 app.layout = dbc.Container([
     # Header with logos
@@ -64,6 +124,11 @@ app.layout = dbc.Container([
             html.P(
                 "Evaluate your country's institutional setting for Disaster Risk Management across six critical pillars.",
                 className="text-center text-muted mb-4 lead"
+            ),
+            dbc.Alert(
+                "Quick prototype: this will be updated following test cases. Your feedback is welcomed.",
+                color="info",
+                className="mb-4 text-center"
             )
         ], width=12)
     ]),
@@ -74,46 +139,59 @@ app.layout = dbc.Container([
             # Section 1: Input Form
             html.Div([
                 html.H3("Section 1: Assessment Data", className="mb-4"),
-                html.P("Fill in the assessment values for each DRM component with a value between 0 and 1.", className="text-muted"),
-                
-                # Table container
-                html.Div(id="table-container", className="table-responsive"),
-                
-                # Buttons
-                dbc.Row([
-                    dbc.Col([
-                        dbc.Button(
-                            "See Results",
-                            id="submit-button",
-                            color="primary",
-                            size="lg",
-                            className="mt-4 me-2"
-                        ),
-                        dbc.Button(
-                            "Reset",
-                            id="reset-button",
-                            color="secondary",
-                            outline=True,
-                            size="lg",
-                            className="mt-4"
-                        )
-                    ], width=12)
-                ]),
+
+                # Paste area to bulk-populate the table
+                html.Div([
+                    html.Label("Please paste the data from cell D7 of your spreadsheet after completing the diagnostic:", className="form-label fw-semibold"),
+                    dcc.Textarea(id="paste-input", placeholder="",
+                                  style={"width": "100%", "height": "110px", "fontFamily": "monospace"}),
+                    html.Div([
+                        dbc.Button("See Results", id="paste-apply", color="primary", className="mt-2 me-2"),
+                        dbc.Button("Show Example", id="example-button", color="info", outline=True, className="mt-2")
+                    ]),
+                    html.Div(id="paste-feedback", className="mt-2"),
+                    # Collapsible example section
+                    dbc.Collapse(
+                        dbc.Card(dbc.CardBody([
+                            html.Pre(
+                                "Pillar,Subpillar,Legal and institutional set up,Intermediary DRM outputs,Key DRM achievements,Policy enablers;\n"
+                                "Legal and Institutional DRM Framework,DRM policies and institutions,1,1,1,0.33;\n"
+                                "Legal and Institutional DRM Framework,Mainstreaming DRM into national and sectoral development plans,1,0,1,0;\n"
+                                "Risk Identification,Risk Identification,1,0.5,1,1;\n"
+                                "Risk Reduction,Territorial and urban planning,1,1,1,0.5;\n"
+                                "Risk Reduction,Public investment at the central level,1,1,1,0;\n"
+                                "Risk Reduction,Sector-specific risk reduction measures,1,0,0,0;\n"
+                                "Preparedness,Early Warning Systems (EWS),1,1,1,1;\n"
+                                "Preparedness,Emergency Preparedness and Response (EP&R),1,1,0.5,1;\n"
+                                "Preparedness,Adaptive Social Protection (ASP),0,0,0,0;\n"
+                                "Financial Protection,Fiscal risk management,0,1,1,1;\n"
+                                "Financial Protection,Disaster Risk Financing (DRF) strategies and instruments,1,0,0,1;\n"
+                                "Resilient Reconstruction,Resilient Reconstruction,1,0,1,0",
+                                style={"whiteSpace": "pre-wrap", "fontFamily": "monospace", "fontSize": "0.85rem"}
+                            )
+                        ])),
+                        id="example-collapse",
+                        is_open=False,
+                        className="mt-2"
+                    )
+                ], className="mb-4"),
+                # Table container (hidden from view, inputs still available to callbacks)
+                html.Div(id="table-container", className="table-responsive", style={"display": "none"}),
             ], className="section-1 p-4 mb-5 border rounded bg-light"),
-            
-            # Confirmation Modal for Reset
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle("Confirm Reset")),
-                dbc.ModalBody("Are you sure you want to clear all values? This action cannot be undone."),
-                dbc.ModalFooter([
-                    dbc.Button("No", id="reset-cancel", className="me-2"),
-                    dbc.Button("Yes", id="reset-confirm", color="danger")
-                ])
-            ], id="reset-modal", centered=True),
-            
+
             # Section 2: Results (hidden initially)
             html.Div([
                 html.H3("Section 2: Assessment Results", className="mb-4"),
+                
+                # Contextual information
+                html.Div([
+                    html.P([
+                        "Disaster risk is a development challenge that must be addressed through multisectoral policies. Unlike traditional sectors, Disaster Risk Management (DRM) cuts across infrastructure sectors, such as energy, water, transport, urban development, as well as socioenvironmental sectors, such as education, health, social protection and environmental management. As a result, disaster risk has direct implication for economic growth, fiscal stability and jobs. While policies for managing the immediate impacts of disasters are vital, a more comprehensive approach is needed to reduce underlying risks. A sound DRM policy framework therefore requires a system-perspective approach to effectively enable disaster resilience."
+                    ], className="text-muted"),
+                    html.P([
+                        "Recognizing this cross-sectoral nature, the World Bank DRM framework provides a structured approach to evaluate a country's DRM policy framework. Drawing on practical country experiences and global good practices, this framework was first proposed in \"The Sendai Report\" (Ghesquiere et al. 2012) and is aligned with the Sendai Framework for DRR. It is organized around six essential components of DRM encompassing not only legal and institutional DRM frameworks, but also key policy dimensions related to risk information, risk reduction at the sectoral and territorial level, EP&R, financial protection and resilient recovery. This standardized framework helps assess the maturity of a country's DRM policy framework and identify potential gaps across critical resilience-building dimensions. In doing so, it supports the identification of priority policy actions to shift from reactive disaster response toward a more strategic and forward-looking approach to managing disaster and climate-related risks."
+                    ], className="text-muted")
+                ], className="mb-4"),
                 
                 # Analysis text
                 html.Div(id="analysis-text", className="mb-4"),
@@ -144,24 +222,68 @@ app.layout = dbc.Container([
     
     # Hidden div to store the current figure
     dcc.Store(id="figure-store"),
+    # Hidden store for pasted data applied to table
+    dcc.Store(id="pasted-data"),
     
 ], fluid=False, style={"maxWidth": "1200px"})
+
+# Callback: parse pasted data and store serialized result
+@app.callback(
+    Output("pasted-data", "data"),
+    Output("paste-feedback", "children"),
+    Input("paste-apply", "n_clicks"),
+    State("paste-input", "value"),
+    prevent_initial_call=True
+)
+def handle_paste(n_clicks, raw_text):
+    if not n_clicks:
+        raise dash.exceptions.PreventUpdate
+    df_parsed, status = parse_pasted_data(raw_text or "")
+    if df_parsed is None:
+        return dash.no_update, html.Div(status, className="alert alert-danger")
+    # Serialize parsed dataframe to the structure expected by generate_table
+    rows_dict = {}
+    for i in range(len(df_parsed)):
+        row_map = {}
+        for col in value_columns:
+            if col in df_parsed.columns:
+                val = df_parsed.iloc[i][col]
+                if val == "" or pd.isna(val):
+                    continue
+                try:
+                    row_map[col] = float(val)
+                except Exception:
+                    continue
+        rows_dict[str(i)] = row_map
+    serialized = {"rows": rows_dict}
+    return serialized, html.Div(status, className="alert alert-success")
 
 # Callback to generate and update the table
 @app.callback(
     Output("table-container", "children"),
-    Input("reset-confirm", "n_clicks"),
+    Input("pasted-data", "data"),
     prevent_initial_call=False
 )
-def generate_table(reset_confirm_clicks):
+def generate_table(pasted_data):
     """Generate the editable table from template"""
-    ctx = dash.callback_context
-    
-    # On initial load, show random values; on reset, show empty table
-    if not ctx.triggered or ctx.triggered[0]["prop_id"] == ".":
+    # On initial load, show random values; on paste, start empty and apply pasted values
+    if not pasted_data:
         df = prepare_table_data(random_values=True)
     else:
         df = prepare_table_data(empty=True)
+
+    # If pasted data exists, map it onto the current df according to template order
+    apply_paste = pasted_data and isinstance(pasted_data, dict) and "rows" in pasted_data
+    if apply_paste:
+        for idx_str, colmap in pasted_data["rows"].items():
+            try:
+                idx = int(idx_str)
+            except Exception:
+                continue
+            if 0 <= idx < len(df):
+                for col, val in colmap.items():
+                    if col in value_columns:
+                        df.at[idx, col] = val
     
     # Clean the dataframe for display
     df_clean = df.copy()
@@ -213,52 +335,43 @@ def generate_table(reset_confirm_clicks):
         hover=True,
         responsive=True,
         striped=True,
+        size="sm",
         className="mb-3"
     )
     
     return table
 
-# Callback to handle form submission and generate figure
+# Callback to generate results on paste or See Results button
 @app.callback(
     [Output("results-section", "style"),
      Output("figure-store", "data"),
      Output("figure-container", "children"),
      Output("analysis-text", "children")],
-    Input("submit-button", "n_clicks"),
-    State({"type": "value-input", "index": dash.ALL}, "id"),
-    State({"type": "value-input", "index": dash.ALL}, "value"),
+    Input("paste-apply", "n_clicks"),
+    Input("pasted-data", "data"),
     prevent_initial_call=True
 )
-def update_results(n_clicks, input_ids, input_values):
-    """Process form data and generate figure"""
-    if not input_ids:
-        return {"display": "none"}, None, "No data to process", ""
+def update_results(n_clicks, pasted_data):
+    """Process pasted data and generate figure"""
+    if not pasted_data or "rows" not in pasted_data:
+        raise dash.exceptions.PreventUpdate
     
-    # Reconstruct the dataframe from inputs - start with empty table
+    # Build dataframe from pasted store
     df = prepare_table_data(empty=True)
-    
-    # Create a mapping of row-column to value
-    for i, (input_id, value) in enumerate(zip(input_ids, input_values)):
-        row_col = input_id["index"]
-        # Split by first dash only to get row index
-        parts = row_col.split("-", 1)
-        if len(parts) == 2:
-            row_idx = int(parts[0])
-            col_name = parts[1]  # The column name as stored in the ID
-            
-            # Match with actual column name
-            if col_name in value_columns and row_idx < len(df):
-                # Validate and convert value
-                if value is None or value == "":
-                    df.at[row_idx, col_name] = 0
-                else:
+    for idx_str, colmap in pasted_data["rows"].items():
+        try:
+            row_idx = int(idx_str)
+        except Exception:
+            continue
+        if 0 <= row_idx < len(df):
+            for col_name, value in colmap.items():
+                if col_name in value_columns:
                     try:
                         num_value = float(value)
-                        # Clamp value between 0 and 1
                         num_value = max(0, min(1, num_value))
-                        df.at[row_idx, col_name] = num_value
                     except (ValueError, TypeError):
-                        df.at[row_idx, col_name] = 0
+                        num_value = 0
+                    df.at[row_idx, col_name] = num_value
     
     # Analyze results - find areas below minimum standard (1.0)
     below_minimum = []
@@ -353,32 +466,16 @@ def download_figure(n_clicks, img_data):
         filename="DRM_Assessment_Result.png"
     )
 
-# Callback to open reset confirmation modal
+# Callback to toggle example collapse
 @app.callback(
-    Output("reset-modal", "is_open"),
-    Input("reset-button", "n_clicks"),
-    Input("reset-cancel", "n_clicks"),
-    Input("reset-confirm", "n_clicks"),
-    State("reset-modal", "is_open"),
+    Output("example-collapse", "is_open"),
+    Input("example-button", "n_clicks"),
+    State("example-collapse", "is_open"),
     prevent_initial_call=True
 )
-def toggle_reset_modal(reset_clicks, cancel_clicks, confirm_clicks, is_open):
-    """Toggle the reset confirmation modal"""
-    ctx = dash.callback_context
-    if not ctx.triggered:
-        return is_open
-    
-    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
-    
-    if button_id == "reset-button":
-        return True
-    elif button_id in ["reset-cancel", "reset-confirm"]:
-        return False
-    
-    return is_open
-
-
-
+def toggle_example(n_clicks, is_open):
+    """Toggle the example data collapse"""
+    return not is_open
 
 
 # Add validation script
