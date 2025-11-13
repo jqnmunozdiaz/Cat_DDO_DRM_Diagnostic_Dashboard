@@ -255,7 +255,7 @@ def generate_figure(df_input):
     
     # Convert to base64
     buffer = BytesIO()
-    plt.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
+    plt.savefig(buffer, format='png', dpi=300, bbox_inches='tight')
     buffer.seek(0)
     image_base64 = base64.b64encode(buffer.getvalue()).decode()
     plt.close(fig)

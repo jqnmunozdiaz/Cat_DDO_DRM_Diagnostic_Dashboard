@@ -8,6 +8,7 @@ from dash import dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 import pandas as pd
 from scripts.figure_generator import generate_figure
+import plotly.graph_objects as go
 import base64
 import os
 import re
@@ -118,9 +119,15 @@ app.layout = dbc.Container([
                 html.P([
                     "Disaster risk is a development challenge that must be addressed through multisectoral policies. Unlike traditional sectors, Disaster Risk Management (DRM) cuts across infrastructure sectors, such as energy, water, transport, urban development, as well as socioenvironmental sectors, such as education, health, social protection and environmental management. As a result, disaster risk has direct implication for economic growth, fiscal stability and jobs. While policies for managing the immediate impacts of disasters are vital, a more comprehensive approach is needed to reduce underlying risks. A sound DRM policy framework therefore requires a system-perspective approach to effectively enable disaster resilience."
                 ], className="text-muted"),
+                
                 html.P([
                     "Recognizing this cross-sectoral nature, the World Bank DRM framework provides a structured approach to evaluate a country's DRM policy framework. Drawing on practical country experiences and global good practices, this framework was first proposed in \"The Sendai Report\" (Ghesquiere et al. 2012) and is aligned with the Sendai Framework for DRR. It is organized around six essential components of DRM encompassing not only legal and institutional DRM frameworks, but also key policy dimensions related to risk information, risk reduction at the sectoral and territorial level, EP&R, financial protection and resilient recovery. This standardized framework helps assess the maturity of a country's DRM policy framework and identify potential gaps across critical resilience-building dimensions. In doing so, it supports the identification of priority policy actions to shift from reactive disaster response toward a more strategic and forward-looking approach to managing disaster and climate-related risks."
-                ], className="text-muted")
+                ], className="text-muted"),
+                
+                html.Div([
+                    html.Img(src="/assets/images/CatDDO_Policy_Framework.png", 
+                             style={"maxWidth": "100%", "height": "auto", "display": "block", "margin": "0 auto"})
+                ], className="text-center mt-3")
             ], className="mb-4"),
             
             # Section 1: Input Form
@@ -200,6 +207,15 @@ app.layout = dbc.Container([
                     className="text-center mb-4"
                 ),
                 
+                # Progress bars by pillar
+                html.Div([
+                    html.H4("Assessment Results - Summary by DRM Pillar", className="mb-3"),
+                    dcc.Graph(id="pillar-progress-bars", config={'displayModeBar': False})
+                ], className="mb-4"),
+                
+                # Data table container
+                html.Div(id="data-table-container", className="mb-4"),
+                
                 # Download buttons
                 dbc.Row([
                     dbc.Col([
@@ -262,7 +278,9 @@ def handle_paste(n_clicks, raw_text):
      Output("results-section", "style"),
      Output("figure-store", "data"),
      Output("figure-container", "children"),
-     Output("analysis-text", "children")],
+     Output("analysis-text", "children"),
+     Output("data-table-container", "children"),
+     Output("pillar-progress-bars", "figure")],
     Input("paste-apply", "n_clicks"),
     Input("pasted-data", "data"),
     prevent_initial_call=True
@@ -348,7 +366,69 @@ def update_results(n_clicks, pasted_data):
             ], className="text-success mb-0")
         ], className="alert alert-success")
     
-    # Generate figure
+    # Calculate average achievement per pillar
+    pillar_scores = {}
+    for pillar in df_analysis["DRM Pillar"].unique():
+        if pillar and pillar not in ["nan", "-", ""]:
+            pillar_rows = df_analysis[df_analysis["DRM Pillar"] == pillar]
+            # Calculate average across all value columns for this pillar
+            pillar_values = []
+            for col in value_columns:
+                for val in pillar_rows[col]:
+                    if val != "" and pd.notna(val):
+                        pillar_values.append(float(val))
+            if pillar_values:
+                avg_score = sum(pillar_values) / len(pillar_values)
+                pillar_scores[pillar] = avg_score * 100  # Convert to percentage
+    
+    # Create horizontal progress bars using Plotly
+    pillars = list(pillar_scores.keys())
+    scores = [pillar_scores[p] for p in pillars]
+    
+    # Determine colors based on score (red if <25%, yellow if <75%, blue if >=75%)
+    colors = []
+    for score in scores:
+        if score < 25:
+            colors.append('#dc3545')  # red
+        elif score < 50:
+            colors.append('#fd7e14')  # orange
+        elif score < 75:
+            colors.append('#ffc107')  # yellow
+        else:
+            colors.append('#0d6efd')  # blue
+    
+    progress_fig = go.Figure()
+    
+    progress_fig.add_trace(go.Bar(
+        y=pillars,
+        x=scores,
+        orientation='h',
+        marker=dict(color=colors),
+        text=[f"{s:.0f}%" for s in scores],
+        textposition='outside',
+        hoverinfo='none',
+        hovertemplate=None
+    ))
+    
+    progress_fig.update_layout(
+        xaxis=dict(
+            title="Achievement (%)",
+            range=[0, 100],
+            showgrid=True,
+            gridcolor='lightgray'
+        ),
+        yaxis=dict(
+            title="",
+            autorange="reversed"
+        ),
+        height=max(300, len(pillars) * 60),
+        margin=dict(l=20, r=80, t=20, b=60),
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        font=dict(size=12)
+    )
+    
+    # Generate circular figure
     try:
         img_str = generate_figure(df)
         
@@ -359,11 +439,32 @@ def update_results(n_clicks, pasted_data):
             )
         ])
         
-        return {"display": "none"}, {"display": "block"}, img_str, figure_html, analysis_text
+        # Create table from dataframe
+        df_display = df_analysis.copy()
+        # Format numeric columns to 2 decimal places
+        for col in value_columns:
+            df_display[col] = df_display[col].apply(lambda x: f"{float(x):.2f}" if x != "" and pd.notna(x) else "")
+        
+        table_html = html.Div([
+            html.H4("Assessment Data", className="mb-3"),
+            dbc.Table.from_dataframe(
+                df_display,
+                striped=True,
+                bordered=True,
+                hover=True,
+                responsive=True,
+                size="sm",
+                className="table-responsive"
+            )
+        ])
+        
+        return {"display": "none"}, {"display": "block"}, img_str, figure_html, analysis_text, table_html, progress_fig
     except Exception as e:
         return {"display": "none"}, {"display": "block"}, None, html.Div([
             html.Div(f"Error generating figure: {str(e)}", className="alert alert-danger")
-        ]), ""
+        ]), "", "", go.Figure()
+        
+    
 
 # Callback for downloading the figure
 @app.callback(
