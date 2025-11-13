@@ -7,11 +7,9 @@ import dash
 from dash import dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 import pandas as pd
-import plotly.graph_objects as go
 from scripts.figure_generator import generate_figure
 import base64
 import os
-import numpy as np
 import re
 
 # Initialize the Dash app
@@ -21,29 +19,8 @@ server = app.server
 # Load the template CSV to get structure
 template_df = pd.read_csv("data/DRM_system_assessment_template_filled_example.csv")
 
-# Extract value columns (all columns except DRM Pillar and DRM sub-pillar)
-value_columns = [col for col in template_df.columns if col not in ["DRM Pillar", "DRM sub-pillar"]]
-
-# Prepare table data - create editable version with only value columns
-def prepare_table_data(empty=False, random_values=False):
-    """Prepare table data for the input form"""
-    df = template_df.copy()
-    if empty:
-        # Clear all value columns
-        for col in value_columns:
-            df[col] = ""
-    elif random_values:
-        # Fill with random values between 0 and 1
-        np.random.seed(42)  # For reproducibility
-        for col in value_columns:
-            # Generate random values, with some being 0 (empty) for variety
-            random_vals = np.random.choice([0, np.random.uniform(0, 1)], size=len(df), p=[0.2, 0.8])
-            df[col] = [round(val, 2) if val > 0 else "" for val in random_vals]
-    else:
-        # Replace "-" with empty string for display
-        for col in value_columns:
-            df[col] = df[col].astype(str).replace("-", "").replace("nan", "")
-    return df
+# Extract value columns (all columns except DRM Pillar and Thematic Area)
+value_columns = [col for col in template_df.columns if col not in ["DRM Pillar", "Thematic Area"]]
 
 def parse_pasted_data(raw_text: str):
     """Parse semicolon-separated rows with comma-separated columns.
@@ -59,9 +36,9 @@ def parse_pasted_data(raw_text: str):
     header = rows[0].split(",")
     # Normalize header spacing
     header = [h.strip() for h in header]
-    required_first_two = ["Pillar", "Subpillar"]
+    required_first_two = ["DRM Pillar", "Thematic Area"]
     if header[0:2] != required_first_two:
-        return None, "Header must start with 'Pillar,Subpillar'"
+        return None, "Header must start with 'DRM Pillar,Thematic Area'"
     # Map remaining headers to template value columns by approximate match
     template_map = {}
     remaining_headers = header[2:]
@@ -84,7 +61,7 @@ def parse_pasted_data(raw_text: str):
             return None, f"Row has {len(cols)} columns, expected {len(header)}: {r}"
         record = {
             "DRM Pillar": cols[0],
-            "DRM sub-pillar": cols[1]
+            "Thematic Area": cols[1]
         }
         # Map each remaining value
         for original_header, raw_val in zip(remaining_headers, cols[2:]):
@@ -126,7 +103,7 @@ app.layout = dbc.Container([
                 className="text-center text-muted mb-4 lead"
             ),
             dbc.Alert(
-                "Quick prototype: this will be updated following test cases. Your feedback is welcomed.",
+                "Prototype: this will be updated following test cases. Your feedback is welcomed.",
                 color="info",
                 className="mb-4 text-center"
             )
@@ -138,7 +115,7 @@ app.layout = dbc.Container([
         dbc.Col([
             # Section 1: Input Form
             html.Div([
-                html.H3("Section 1: Assessment Data", className="mb-4"),
+                html.H3("Assessment Data", className="mb-4"),
                 
                 # Download template button
                 dbc.Row([
@@ -158,33 +135,38 @@ app.layout = dbc.Container([
                         dbc.Button("Show Example", id="example-button", color="info", outline=True, className="mt-2")
                     ]),
                     html.Div(id="paste-feedback", className="mt-2"),
+
                     # Collapsible example section
                     dbc.Collapse(
-                        dbc.Card(dbc.CardBody([
-                            html.Pre(
-                                "Pillar,Subpillar,Legal and institutional set up,Intermediary DRM outputs,Key DRM achievements,Policy enablers;\n"
-                                "Legal and Institutional DRM Framework,DRM policies and institutions,1,1,1,0.33;\n"
-                                "Legal and Institutional DRM Framework,Mainstreaming DRM into national and sectoral development plans,1,0,1,0;\n"
-                                "Risk Identification,Risk Identification,1,0.5,1,1;\n"
-                                "Risk Reduction,Territorial and urban planning,1,1,1,0.5;\n"
-                                "Risk Reduction,Public investment at the central level,1,1,1,0;\n"
-                                "Risk Reduction,Sector-specific risk reduction measures,1,0,0,0;\n"
-                                "Preparedness,Early Warning Systems (EWS),1,1,1,1;\n"
-                                "Preparedness,Emergency Preparedness and Response (EP&R),1,1,0.5,1;\n"
-                                "Preparedness,Adaptive Social Protection (ASP),0,0,0,0;\n"
-                                "Financial Protection,Fiscal risk management,0,1,1,1;\n"
-                                "Financial Protection,Disaster Risk Financing (DRF) strategies and instruments,1,0,0,1;\n"
-                                "Resilient Reconstruction,Resilient Reconstruction,1,0,1,0",
-                                style={"whiteSpace": "pre-wrap", "fontFamily": "monospace", "fontSize": "0.85rem"}
-                            )
-                        ])),
+                        [
+                            html.P(
+                                "Enter the text in cell D7 following the required format. You can copy and paste the example to proceed.",
+                                className="form-text text-muted mb-2"
+                            ),
+                            dbc.Card(dbc.CardBody([
+                                html.Pre(
+                                    "DRM Pillar,Thematic Area,Legal and institutional set up,Intermediary DRM outputs,Key DRM achievements,Policy enablers;\n"
+                                    "Legal and Institutional DRM Framework,DRM policies and institutions,1,1,1,0.33;\n"
+                                    "Legal and Institutional DRM Framework,Mainstreaming DRM into national and sectoral development plans,1,0,1,0;\n"
+                                    "Risk Identification,Risk identification,1,0.5,1,1;\n"
+                                    "Risk Reduction,Territorial and urban planning,1,1,1,0.5;\n"
+                                    "Risk Reduction,Public investment at the central level,1,1,1,0;\n"
+                                    "Risk Reduction,Sector-specific risk reduction measures,1,0,0,0;\n"
+                                    "Preparedness,Early warning systems,1,1,1,1;\n"
+                                    "Preparedness,Emergency preparedness and response,1,1,0.5,1;\n"
+                                    "Preparedness,Adaptive social protection,0,0,0,0;\n"
+                                    "Financial Protection,Fiscal risk management,0,1,1,1;\n"
+                                    "Financial Protection,DRF strategies and instruments,1,0,0,1;\n"
+                                    "Resilient Reconstruction,Resilient reconstruction,1,0,1,0",
+                                    style={"whiteSpace": "pre-wrap", "fontFamily": "monospace", "fontSize": "0.85rem"}
+                                )
+                            ]))
+                        ],
                         id="example-collapse",
                         is_open=False,
                         className="mt-2"
                     )
                 ], className="mb-4"),
-                # Table container (hidden from view, inputs still available to callbacks)
-                html.Div(id="table-container", className="table-responsive", style={"display": "none"}),
             ], id="section-1", className="section-1 p-4 mb-5 border rounded bg-light"),
 
             # Section 2: Results (hidden initially)
@@ -192,7 +174,7 @@ app.layout = dbc.Container([
                 # Title with Back button on the right
                 dbc.Row([
                     dbc.Col([
-                        html.H3("Section 2: Assessment Results", className="mb-0")
+                        html.H3("Assessment Results", className="mb-0")
                     ], width="auto"),
                     dbc.Col([
                         dbc.Button("Back", id="back-button", color="secondary", outline=True, size="sm")
@@ -274,89 +256,6 @@ def handle_paste(n_clicks, raw_text):
     serialized = {"rows": rows_dict}
     return serialized, html.Div(status, className="alert alert-success")
 
-# Callback to generate and update the table
-@app.callback(
-    Output("table-container", "children"),
-    Input("pasted-data", "data"),
-    prevent_initial_call=False
-)
-def generate_table(pasted_data):
-    """Generate the editable table from template"""
-    # On initial load, show random values; on paste, start empty and apply pasted values
-    if not pasted_data:
-        df = prepare_table_data(random_values=True)
-    else:
-        df = prepare_table_data(empty=True)
-
-    # If pasted data exists, map it onto the current df according to template order
-    apply_paste = pasted_data and isinstance(pasted_data, dict) and "rows" in pasted_data
-    if apply_paste:
-        for idx_str, colmap in pasted_data["rows"].items():
-            try:
-                idx = int(idx_str)
-            except Exception:
-                continue
-            if 0 <= idx < len(df):
-                for col, val in colmap.items():
-                    if col in value_columns:
-                        df.at[idx, col] = val
-    
-    # Clean the dataframe for display
-    df_clean = df.copy()
-    
-    # Remove leading numbers (e.g., "1. ", "2.1. ") from pillar and sub-pillar names
-    df_clean["DRM Pillar"] = df_clean["DRM Pillar"].astype(str).str.replace(r'^\d+\.\s*', '', regex=True)
-    df_clean["DRM sub-pillar"] = df_clean["DRM sub-pillar"].astype(str).str.replace(r'^\d+\.?\d*\.?\s*', '', regex=True)
-    
-    # Forward fill pillar names to replace "nan" with the actual pillar
-    df_clean["DRM Pillar"] = df_clean["DRM Pillar"].replace("nan", "").replace("", pd.NA)
-    df_clean["DRM Pillar"] = df_clean["DRM Pillar"].ffill()
-    
-    # Replace "nan" and "-" in sub-pillars with empty string
-    df_clean["DRM sub-pillar"] = df_clean["DRM sub-pillar"].replace(["nan", "-"], "")
-    
-    # Create table
-    table = dbc.Table(
-        [
-            html.Thead(
-                html.Tr([
-                    html.Th("DRM Pillar", style={"width": "20%"}),
-                    html.Th("DRM Sub-pillar", style={"width": "25%"}),
-                    *[html.Th(col, style={"width": f"{55/len(value_columns):.1f}%"}) for col in value_columns]
-                ])
-            ),
-            html.Tbody([
-                html.Tr([
-                    html.Td(str(row["DRM Pillar"]) if pd.notna(row["DRM Pillar"]) else "", className="pillar-cell"),
-                    html.Td(str(row["DRM sub-pillar"]) if row["DRM sub-pillar"] != "" else "", className="subpillar-cell"),
-                    *[
-                        html.Td(
-                            dbc.Input(
-                                type="number",
-                                step=0.01,
-                                min=0,
-                                max=1,
-                                value=row[col] if row[col] != "" else None,
-                                id={"type": "value-input", "index": f"{idx}-{col}"},
-                                className="form-control-sm",
-                                placeholder="",
-                                debounce=True
-                            )
-                        ) for col in value_columns
-                    ]
-                ]) for idx, (_, row) in enumerate(df_clean.iterrows())
-            ])
-        ],
-        bordered=True,
-        hover=True,
-        responsive=True,
-        striped=True,
-        size="sm",
-        className="mb-3"
-    )
-    
-    return table
-
 # Callback to generate results on paste or See Results button
 @app.callback(
     [Output("section-1", "style"),
@@ -373,8 +272,11 @@ def update_results(n_clicks, pasted_data):
     if not pasted_data or "rows" not in pasted_data:
         raise dash.exceptions.PreventUpdate
     
-    # Build dataframe from pasted store
-    df = prepare_table_data(empty=True)
+    # Build dataframe from pasted store / Prepare table data for the input form, empty
+    df = template_df.copy() 
+    for col in value_columns:
+        df[col] = ""
+    
     for idx_str, colmap in pasted_data["rows"].items():
         try:
             row_idx = int(idx_str)
@@ -396,11 +298,11 @@ def update_results(n_clicks, pasted_data):
     # Group by pillar and calculate total scores
     df_analysis = df.copy()
     df_analysis["DRM Pillar"] = template_df["DRM Pillar"].ffill()
-    df_analysis["DRM sub-pillar"] = template_df["DRM sub-pillar"]
+    df_analysis["Thematic Area"] = template_df["Thematic Area"]
     
     # Clean pillar names
     df_analysis["DRM Pillar"] = df_analysis["DRM Pillar"].astype(str).str.replace(r'^\d+\.\s*', '', regex=True)
-    df_analysis["DRM sub-pillar"] = df_analysis["DRM sub-pillar"].astype(str).str.replace(r'^\d+\.?\d*\.?\s*', '', regex=True)
+    df_analysis["Thematic Area"] = df_analysis["Thematic Area"].astype(str).str.replace(r'^\d+\.?\d*\.?\s*', '', regex=True)
     
     for idx, row in df_analysis.iterrows():
         # Calculate sum across value columns for this row
@@ -408,7 +310,7 @@ def update_results(n_clicks, pasted_data):
         
         if row_sum < 1.0:
             pillar = row["DRM Pillar"]
-            subpillar = row["DRM sub-pillar"]
+            subpillar = row["Thematic Area"]
             
             # Determine what to display
             if subpillar and subpillar not in ["nan", "-", ""]:
@@ -424,7 +326,7 @@ def update_results(n_clicks, pasted_data):
                 html.P([
                     html.Strong("⚠️ Areas Below Minimum Standard:"),
                     html.Br(),
-                    f"The following area does not meet the minimum standard (total score < 1): "
+                    f"The following area does not meet the minimum standard: "
                 ], className="text-warning mb-2"),
                 html.Ul([html.Li(area) for area in unique_areas], className="mb-0")
             ], className="alert alert-warning")
@@ -433,7 +335,7 @@ def update_results(n_clicks, pasted_data):
                 html.P([
                     html.Strong("⚠️ Areas Below Minimum Standard:"),
                     html.Br(),
-                    f"The following {len(unique_areas)} areas do not meet the minimum standard (total score < 1): "
+                    f"The following {len(unique_areas)} areas do not meet the minimum standard: "
                 ], className="text-warning mb-2"),
                 html.Ul([html.Li(area) for area in unique_areas], className="mb-0")
             ], className="alert alert-warning")

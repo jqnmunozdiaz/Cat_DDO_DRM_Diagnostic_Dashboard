@@ -27,15 +27,15 @@ def generate_figure(df_input):
     df_raw = df_input.copy()
     
     # Remove completely empty rows
-    df_raw = df_raw[df_raw["DRM Pillar"].notna() | df_raw["DRM sub-pillar"].notna()].copy()
+    df_raw = df_raw[df_raw["DRM Pillar"].notna() | df_raw["Thematic Area"].notna()].copy()
     
     # Define the assessment category columns
-    value_cols = [col for col in df_raw.columns if col not in ["DRM Pillar", "DRM sub-pillar"]]
+    value_cols = [col for col in df_raw.columns if col not in ["DRM Pillar", "Thematic Area"]]
     
     # Create labels
     df_raw["individual"] = df_raw.apply(
-        lambda row: row["DRM sub-pillar"].strip() 
-        if pd.notna(row["DRM sub-pillar"]) and row["DRM sub-pillar"].strip() != "-" 
+        lambda row: row["Thematic Area"].strip() 
+        if pd.notna(row["Thematic Area"]) and row["Thematic Area"].strip() != "-" 
         else row["DRM Pillar"] if pd.notna(row["DRM Pillar"]) else "", 
         axis=1
     )
@@ -186,17 +186,17 @@ def generate_figure(df_input):
     
     # Add individual bar labels
     d = {'DRM policies and institutions': 'DRM policies\nand\ninstitutions',
-         'DRM in national and sectoral development plans': 'DRM in\nnational and\nsectoral\ndevelopment\nplans',
-         'Risk Identification': 'Risk\nIdentification',
+         'Mainstreaming DRM into national and sectoral development plans': 'Mainstreaming\nDRM into\nnational and\nsectoral\ndevelopment\nplans',
+         'Risk identification': 'Risk\nidentification',
          'Territorial and urban planning': 'Territorial\nand\nurban\nplanning',
          'Public investment at the central level': 'Public\ninvestment at\nthe central\nlevel',
          'Sector-specific risk reduction measures': 'Sector-specific\nrisk\nreduction\nmeasures',
-         'EWS': 'EWS',
-         'EP&R': 'EP&R',
-         'ASP': 'ASP',
+         'Early warning systems': 'Early\nwarning\nsystems',
+         'Emergency preparedness and response': 'Emergency\npreparedness\n& response',
+         'Adaptive social protection': 'Adaptive\nsocial\nprotection',
          'Fiscal risk management': 'Fiscal risk\nmanagement',
          'DRF strategies and instruments': 'DRF strategies\nand\ninstruments',
-         'Resilient Reconstruction': 'Resilient\nReconstruction'}
+         'Resilient reconstruction': 'Resilient\nreconstruction'}
     
     for old, new in d.items():
         label_data["individual"] = label_data["individual"].astype(str).str.replace(old, new, regex=False)
