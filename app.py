@@ -98,9 +98,9 @@ app.layout = dbc.Container([
     # Header
     dbc.Row([
         dbc.Col([
-            html.H1("DRM Diagnostic Assessment Tool", className="mb-2 text-center"),
+            html.H1("A Disaster Risk Management Policy Diagnostic Tool", className="mb-2 text-center"),
             html.P(
-                "Evaluate your country's institutional setting for Disaster Risk Management across six critical pillars.",
+                "Evaluate your country's policy and institutional setting for Disaster Risk Management across six critical pillars",
                 className="text-center text-muted mb-4 lead"
             ),
             dbc.Alert(
@@ -116,24 +116,65 @@ app.layout = dbc.Container([
         dbc.Col([
             # Contextual information
             html.Div([
+                html.H3("Introduction", className="mb-3"),
+
                 html.P([
-                    "Disaster risk is a development challenge that must be addressed through multisectoral policies. Unlike traditional sectors, Disaster Risk Management (DRM) cuts across infrastructure sectors, such as energy, water, transport, urban development, as well as socioenvironmental sectors, such as education, health, social protection and environmental management. As a result, disaster risk has direct implication for economic growth, fiscal stability and jobs. While policies for managing the immediate impacts of disasters are vital, a more comprehensive approach is needed to reduce underlying risks. A sound DRM policy framework therefore requires a system-perspective approach to effectively enable disaster resilience."
+                    html.Strong("A sound Disaster Risk Management (DRM) policy assessment requires a system-wide perspective. "), "Unlike traditional sectors, DRM cuts across infrastructure sectors, such as energy, water, transport, urban development, as well as socioenvironmental sectors, such as education, health, social protection and environmental management. Disaster risk also affects economic growth, fiscal stability and jobs. In short, disaster risk is a development challenge arising from the interaction of hazard, exposure, and vulnerability. While managing the immediate impacts of disasters is vital, building disaster resilience therefor requires a more comprehensive, multisectoral policy approach."
                 ], className="text-muted"),
                 
                 html.P([
-                    "Recognizing this cross-sectoral nature, the World Bank DRM framework provides a structured approach to evaluate a country's DRM policy framework. Drawing on practical country experiences and global good practices, this framework was first proposed in \"The Sendai Report\" (Ghesquiere et al. 2012) and is aligned with the Sendai Framework for DRR. It is organized around six essential components of DRM encompassing not only legal and institutional DRM frameworks, but also key policy dimensions related to risk information, risk reduction at the sectoral and territorial level, EP&R, financial protection and resilient recovery. This standardized framework helps assess the maturity of a country's DRM policy framework and identify potential gaps across critical resilience-building dimensions. In doing so, it supports the identification of priority policy actions to shift from reactive disaster response toward a more strategic and forward-looking approach to managing disaster and climate-related risks."
+                    html.Strong("Recognizing this, the World Bank DRM framework provides a structured approach to evaluate a country's policy and institutional setup for DRM. "), "Drawing on practical country experiences and global good practices, this framework was first proposed in 'The Sendai Report' (Ghesquiere et al. 2012) and is aligned with the Sendai Framework for DRR. It is organized around six essential components of DRM encompassing not only legal and institutional DRM frameworks, but also key policy dimensions related to risk information, risk reduction at the sectoral and territorial level, emergency preparedness and response, financial protection and resilient recovery."
                 ], className="text-muted"),
                 
                 html.Div([
                     html.Img(src="/assets/images/CatDDO_Policy_Framework.png", 
-                             style={"maxWidth": "100%", "height": "auto", "display": "block", "margin": "0 auto"})
-                ], className="text-center mt-3")
+                             style={"maxWidth": "100%", "height": "auto", "display": "block", "margin": "0 auto", "marginBottom": "20px"})
+                ], className="text-center mt-3"),
+                
+                html.P([
+                    html.Strong("Building upon this framework, the proposed diagnostic tool enables task teams to conduct a standardized assessment of the maturity of a country's DRM system. The goal is to identify the main policy gaps that may be constraining resilience-building efforts across each DRM pillar.")
+                ], className="text-muted"),
+                
+            ], className="mb-4"),
+            
+            # Guidelines section
+            html.Div([
+                html.H3("Guidelines for Using the Tool", className="mb-3"),
+                                
+                html.P([
+                    "The tool reviews each DRM pillar through a series of closed questions organized under four policy dimensions: (i) ", html.Strong("Legal and institutional setup"), ", (ii) ", html.Strong("Intermediary DRM outputs"), ", (iii) ", html.Strong("Key achievements"), ", and (iv) ", html.Strong("Policy enablers"), "."
+                ], className="text-muted"),
+                
+                html.P([
+                    "The first three policy dimensions follow the result chain logic used in World Bank Development Policy Financing (DPF) operations—moving from policy inputs and implementation to tangible outcomes that contribute to build disaster resilience. They help assess whether an adequate legal and institutional framework exists, evaluate implementation status using standard DRM intermediary outputs and, eventually, appraising achievements and outcomes using indicators that reflect changes in behaviour, institutions, or systems. In essence, these first three dimensions intend to capture whether the minimum policy and institutional requirements for the different components of DRM exists and assess to which extent measurable development results that contribute to build resilience are being achieved. The fourth dimension captures the extent to which DRM policies reflect international best practice."
+                ], className="text-muted"),
+                
+                html.P([
+                    "The tool is structured as an Excel-based policy matrix where each row corresponds to a DRM pillar and each column to a policy dimension. Progress across columns indicates the degree of policy maturity of a specific pillar, while progress across rows reflects the extent of DRM mainstreaming across sectors. Together, these dimensions provide key insights into the overall maturity of the national DRM system."
+                ], className="text-muted"),
+                
+                html.H5("Filling in the Excel-based questionnaire", className="mt-3 mb-2"),
+                
+                html.P([
+                    "In this pilot phase, task team can download the Excel version of the tool for offline use. To ensure objectivity and speed, teams are asked to provide a \"Yes\" or \"No\" answer. This answer must be based on official documents that justify the existence of a series of legal, regulatory, institutional and budgetary conditions that are considered fundamental for managing disaster risk."
+                ], className="text-muted"),
+                
+                html.P([
+                    "This is a high-level assessment designed to be completed quickly. If information for a question is unavailable, teams are encouraged to consult other Global Practice (GP) colleagues or national counterparts. This is particularly relevant under Pillar 3, where inputs from colleagues in the Water, Transport, Education, Health, and Agriculture GP can greatly help in gathering the relevant knowledge base."
+                ], className="text-muted"),
+                
+                html.P([
+                    "Once all questions are completed, copy/paste the content cell D7 below. The system will automatically generate key metrics and visual outputs."
+                ], className="text-muted"),
+                
+                html.P([
+                    html.Strong("Note: "), "Unanswered questions are treated as \"No\"."
+                ], className="text-muted fst-italic"),
+                
             ], className="mb-4"),
             
             # Section 1: Input Form
-            html.Div([
-                html.H3("Assessment Data", className="mb-4"),
-                
+            html.Div([               
                 # Download template button
                 dbc.Row([
                     dbc.Col([
@@ -198,6 +239,24 @@ app.layout = dbc.Container([
                     ], width="auto", className="ms-auto")
                 ], align="center", className="mb-4"),
                 
+                # Interpreting the Results section
+                html.Div([
+                    html.H4("Interpreting the Results", className="mb-3"),
+                    
+                    html.P([
+                        "The petal diagram encapsulates the assessment results. Each petal represents a thematic area of the DRM framework, grouped by thematic area. Below the diagram, results are aggregated by DRM pillar to highlight key drivers and gaps."
+                    ], className="text-muted"),
+                    
+                    html.Ul([
+                        html.Li([html.Strong("Petal length"), " reflects progress in that thematic area: the longer the size of the petal, the more advanced the country is."]),
+                        html.Li([html.Strong("Colors"), " represent the four policy dimensions underpinning the length of each petal."]),
+                        html.Li([html.Strong("When a petal extends beyond the red circle"), ", minimum policy requirements for that area are considered in place."]),
+                        html.Li([html.Strong("Countries with mature DRM systems"), " typically have most petals exceeding the red circle, with some approaching the frontier (i.e., exhibiting a level of advances close to the global benchmark frontier)."]),
+                    ], className="text-muted"),
+                    
+                ], className="mb-4"),
+                
+                
                 # Analysis text
                 html.Div(id="analysis-text", className="mb-4"),
                 
@@ -213,8 +272,27 @@ app.layout = dbc.Container([
                     dcc.Graph(id="pillar-progress-bars", config={'displayModeBar': False})
                 ], className="mb-4"),
                 
-                # Data table container
-                html.Div(id="data-table-container", className="mb-4"),
+                # Closing interpretation text
+                html.Div([
+                    html.P([
+                        "The diagnostic should be seen as a starting point for structuring a DRM policy dialogue—not as a final evaluation. Shorter petals indicate areas where the policy framework is weak and/or not producing the expected outcomes. Depending on a range of factors (e.g., political momentum, internal resources, country prioritization), this policy area may be prioritized for further support."
+                    ], className="text-muted"),
+                    
+                    html.P([
+                        "Ultimately, this tool supports the identification of priority policy actions—whether to inform the preparation of a Cat DDO operation or to guide Technical Assistance—helping countries shift from reactive disaster response toward a proactive, strategic approach to managing disaster and climate-related risks."
+                    ], className="text-muted"),
+                    
+                    html.P([
+                        "While the evaluation reflects lessons learned and good practices that can serve as a foundation for a robust DRM policy framework, it should not be interpreted as prescriptive guidance. Disaster risk is highly context-specific, and this diagnostic represents only an initial step toward developing an appropriate and effective DRM policy program."
+                    ], className="text-muted"),
+                    
+                    html.P([
+                        "Task teams are encouraged to consult the report ", 
+                        html.Em("Driving Resilience Through Policy Reforms"), 
+                        " for further guidance on how to structure a context-relevant DRM policy program."
+                    ], className="text-muted"),
+                    
+                ], className="mb-4"),
                 
                 # Download buttons
                 dbc.Row([
@@ -279,7 +357,6 @@ def handle_paste(n_clicks, raw_text):
      Output("figure-store", "data"),
      Output("figure-container", "children"),
      Output("analysis-text", "children"),
-     Output("data-table-container", "children"),
      Output("pillar-progress-bars", "figure")],
     Input("paste-apply", "n_clicks"),
     Input("pasted-data", "data"),
@@ -439,30 +516,11 @@ def update_results(n_clicks, pasted_data):
             )
         ])
         
-        # Create table from dataframe
-        df_display = df_analysis.copy()
-        # Format numeric columns to 2 decimal places
-        for col in value_columns:
-            df_display[col] = df_display[col].apply(lambda x: f"{float(x):.2f}" if x != "" and pd.notna(x) else "")
-        
-        table_html = html.Div([
-            html.H4("Assessment Data", className="mb-3"),
-            dbc.Table.from_dataframe(
-                df_display,
-                striped=True,
-                bordered=True,
-                hover=True,
-                responsive=True,
-                size="sm",
-                className="table-responsive"
-            )
-        ])
-        
-        return {"display": "none"}, {"display": "block"}, img_str, figure_html, analysis_text, table_html, progress_fig
+        return {"display": "none"}, {"display": "block"}, img_str, figure_html, analysis_text, progress_fig
     except Exception as e:
         return {"display": "none"}, {"display": "block"}, None, html.Div([
             html.Div(f"Error generating figure: {str(e)}", className="alert alert-danger")
-        ]), "", "", go.Figure()
+        ]), "", go.Figure()
         
     
 
