@@ -230,18 +230,13 @@ app.layout = dbc.Container([
             # Section 2: Results (hidden initially)
             html.Div([
                 # Title with Back button on the right
-                dbc.Row([
-                    dbc.Col([
-                        html.H3("Assessment Results", className="mb-0")
-                    ], width="auto"),
-                    dbc.Col([
-                        dbc.Button("Back", id="back-button", color="secondary", outline=True, size="sm")
-                    ], width="auto", className="ms-auto")
-                ], align="center", className="mb-4"),
+                html.Div([
+                    html.H3("Assessment Results", className="mb-3 mt-0"),
+                    dbc.Button("Back", id="back-button", color="secondary", outline=True, size="sm", className="mt-0")
+                ], className="mb-4", style={"display": "flex", "alignItems": "flex-start", "justifyContent": "space-between"}),
                 
                 # Interpreting the Results section
                 html.Div([
-                    html.H4("Interpreting the Results", className="mb-3"),
                     
                     html.P([
                         "The petal diagram encapsulates the assessment results. Each petal represents a thematic area of the DRM framework, grouped by thematic area. Below the diagram, results are aggregated by DRM pillar to highlight key drivers and gaps."
@@ -256,10 +251,20 @@ app.layout = dbc.Container([
                     
                 ], className="mb-4"),
                 
-                
-                # Analysis text
-                html.Div(id="analysis-text", className="mb-4"),
-                
+                # Closing interpretation text
+                html.Div([
+                    html.P([
+                        "The diagnostic should be seen as a starting point for structuring a DRM policy dialogue—not as a final evaluation. Shorter petals indicate areas where the policy framework is weak and/or not producing the expected outcomes. Depending on a range of factors (e.g., political momentum, internal resources, country prioritization), this policy area may be prioritized for further support. Ultimately, this tool supports the identification of priority policy actions—whether to inform the preparation of a Cat DDO operation or to guide Technical Assistance—helping countries shift from reactive disaster response toward a proactive, strategic approach to managing disaster and climate-related risks."
+                    ], className="text-muted"),
+                    
+                    html.P([
+                        "While the evaluation reflects lessons learned and good practices that can serve as a foundation for a robust DRM policy framework, it should not be interpreted as prescriptive guidance. Disaster risk is highly context-specific, and this diagnostic represents only an initial step toward developing an appropriate and effective DRM policy program. Task teams are encouraged to consult the report ", 
+                        html.A(html.Em("Driving Resilience Through Policy Reforms"), href="https://documents.worldbank.org/en/publication/documents-reports/documentdetail/099101125110542181"), 
+                        " for further guidance on how to structure a context-relevant DRM policy program."
+                    ], className="text-muted"),
+                    
+                ], className="mb-4"),
+
                 # Figure container
                 html.Div(
                     id="figure-container",
@@ -272,28 +277,10 @@ app.layout = dbc.Container([
                     dcc.Graph(id="pillar-progress-bars", config={'displayModeBar': False})
                 ], className="mb-4"),
                 
-                # Closing interpretation text
-                html.Div([
-                    html.P([
-                        "The diagnostic should be seen as a starting point for structuring a DRM policy dialogue—not as a final evaluation. Shorter petals indicate areas where the policy framework is weak and/or not producing the expected outcomes. Depending on a range of factors (e.g., political momentum, internal resources, country prioritization), this policy area may be prioritized for further support."
-                    ], className="text-muted"),
-                    
-                    html.P([
-                        "Ultimately, this tool supports the identification of priority policy actions—whether to inform the preparation of a Cat DDO operation or to guide Technical Assistance—helping countries shift from reactive disaster response toward a proactive, strategic approach to managing disaster and climate-related risks."
-                    ], className="text-muted"),
-                    
-                    html.P([
-                        "While the evaluation reflects lessons learned and good practices that can serve as a foundation for a robust DRM policy framework, it should not be interpreted as prescriptive guidance. Disaster risk is highly context-specific, and this diagnostic represents only an initial step toward developing an appropriate and effective DRM policy program."
-                    ], className="text-muted"),
-                    
-                    html.P([
-                        "Task teams are encouraged to consult the report ", 
-                        html.Em("Driving Resilience Through Policy Reforms"), 
-                        " for further guidance on how to structure a context-relevant DRM policy program."
-                    ], className="text-muted"),
-                    
-                ], className="mb-4"),
+                # Analysis text
+                html.Div(id="analysis-text", className="mb-4"),
                 
+    
                 # Download buttons
                 dbc.Row([
                     dbc.Col([
