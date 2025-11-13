@@ -14,7 +14,7 @@ import os
 import re
 
 # Initialize the Dash app
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
 server = app.server
 
 # Load the template CSV to get structure
@@ -225,7 +225,7 @@ app.layout = dbc.Container([
                         className="mt-2"
                     )
                 ], className="mb-4"),
-            ], id="section-1", className="section-1 p-4 mb-5 border rounded bg-light"),
+            ], id="section-1", className="section-1 p-4 mb-5 border rounded", style={"backgroundColor": "#f8f9fa"}),
 
             # Section 2: Results (hidden initially)
             html.Div([
@@ -291,7 +291,7 @@ app.layout = dbc.Container([
                 
                 # Analysis text
                 html.Div(id="analysis-text", className="mb-4")
-            ], id="results-section", className="section-2 p-4 border rounded bg-light", style={"display": "none"}),
+            ], id="results-section", className="section-2 p-4 border rounded", style={"display": "none", "backgroundColor": "#f8f9fa"}),
             
         ], width=12, lg=10)
     ], justify="center"),
