@@ -113,6 +113,16 @@ app.layout = dbc.Container([
     # Main content
     dbc.Row([
         dbc.Col([
+            # Contextual information
+            html.Div([
+                html.P([
+                    "Disaster risk is a development challenge that must be addressed through multisectoral policies. Unlike traditional sectors, Disaster Risk Management (DRM) cuts across infrastructure sectors, such as energy, water, transport, urban development, as well as socioenvironmental sectors, such as education, health, social protection and environmental management. As a result, disaster risk has direct implication for economic growth, fiscal stability and jobs. While policies for managing the immediate impacts of disasters are vital, a more comprehensive approach is needed to reduce underlying risks. A sound DRM policy framework therefore requires a system-perspective approach to effectively enable disaster resilience."
+                ], className="text-muted"),
+                html.P([
+                    "Recognizing this cross-sectoral nature, the World Bank DRM framework provides a structured approach to evaluate a country's DRM policy framework. Drawing on practical country experiences and global good practices, this framework was first proposed in \"The Sendai Report\" (Ghesquiere et al. 2012) and is aligned with the Sendai Framework for DRR. It is organized around six essential components of DRM encompassing not only legal and institutional DRM frameworks, but also key policy dimensions related to risk information, risk reduction at the sectoral and territorial level, EP&R, financial protection and resilient recovery. This standardized framework helps assess the maturity of a country's DRM policy framework and identify potential gaps across critical resilience-building dimensions. In doing so, it supports the identification of priority policy actions to shift from reactive disaster response toward a more strategic and forward-looking approach to managing disaster and climate-related risks."
+                ], className="text-muted")
+            ], className="mb-4"),
+            
             # Section 1: Input Form
             html.Div([
                 html.H3("Assessment Data", className="mb-4"),
@@ -180,16 +190,6 @@ app.layout = dbc.Container([
                         dbc.Button("Back", id="back-button", color="secondary", outline=True, size="sm")
                     ], width="auto", className="ms-auto")
                 ], align="center", className="mb-4"),
-                
-                # Contextual information
-                html.Div([
-                    html.P([
-                        "Disaster risk is a development challenge that must be addressed through multisectoral policies. Unlike traditional sectors, Disaster Risk Management (DRM) cuts across infrastructure sectors, such as energy, water, transport, urban development, as well as socioenvironmental sectors, such as education, health, social protection and environmental management. As a result, disaster risk has direct implication for economic growth, fiscal stability and jobs. While policies for managing the immediate impacts of disasters are vital, a more comprehensive approach is needed to reduce underlying risks. A sound DRM policy framework therefore requires a system-perspective approach to effectively enable disaster resilience."
-                    ], className="text-muted"),
-                    html.P([
-                        "Recognizing this cross-sectoral nature, the World Bank DRM framework provides a structured approach to evaluate a country's DRM policy framework. Drawing on practical country experiences and global good practices, this framework was first proposed in \"The Sendai Report\" (Ghesquiere et al. 2012) and is aligned with the Sendai Framework for DRR. It is organized around six essential components of DRM encompassing not only legal and institutional DRM frameworks, but also key policy dimensions related to risk information, risk reduction at the sectoral and territorial level, EP&R, financial protection and resilient recovery. This standardized framework helps assess the maturity of a country's DRM policy framework and identify potential gaps across critical resilience-building dimensions. In doing so, it supports the identification of priority policy actions to shift from reactive disaster response toward a more strategic and forward-looking approach to managing disaster and climate-related risks."
-                    ], className="text-muted")
-                ], className="mb-4"),
                 
                 # Analysis text
                 html.Div(id="analysis-text", className="mb-4"),
