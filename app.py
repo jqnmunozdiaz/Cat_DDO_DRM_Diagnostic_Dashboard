@@ -146,7 +146,7 @@ app.layout = dbc.Container([
                 ], className="text-muted"),
                 
                 html.P([
-                    "The first three policy dimensions follow the result chain logic used in World Bank Development Policy Financing (DPF) operations—moving from policy inputs and implementation to tangible outcomes that contribute to build disaster resilience. They help assess whether an adequate legal and institutional framework exists, evaluate implementation status using standard DRM intermediary outputs and, eventually, appraising achievements and outcomes using indicators that reflect changes in behaviour, institutions, or systems. In essence, these first three dimensions intend to capture whether the minimum policy and institutional requirements for the different components of DRM exists and assess to which extent measurable development results that contribute to build resilience are being achieved. The fourth dimension captures the extent to which DRM policies reflect international best practice."
+                    "The first three policy dimensions follow the result chain logic used in World Bank Development Policy Financing (DPF) operations—moving from policy inputs and implementation to tangible outcomes that contribute to build disaster resilience. They help assess whether an adequate legal and institutional framework exists, evaluate implementation status using standard DRM intermediary outputs and, eventually, appraising achievements and outcomes using indicators that reflect changes in behaviour, institutions, or systems. The fourth dimension captures the extent to which DRM policies reflect international best practice."
                 ], className="text-muted"),
                 
                 html.P([
@@ -164,7 +164,7 @@ app.layout = dbc.Container([
                 ], className="text-muted"),
                 
                 html.P([
-                    "Once all questions are completed, copy/paste the content cell D7 below. The system will automatically generate key metrics and visual outputs."
+                    "Once all questions are completed, copy/paste the content of cell D7 below. The system will automatically generate key metrics and visual outputs."
                 ], className="text-muted"),
                 
                 html.P([
@@ -273,27 +273,24 @@ app.layout = dbc.Container([
                 
                 # Progress bars by pillar
                 html.Div([
-                    html.H4("Assessment Results - Summary by DRM Pillar", className="mb-3"),
-                    dcc.Graph(id="pillar-progress-bars", config={'displayModeBar': False})
+                    html.Div([
+                        html.H5("Results by DRM Pillar", className="mb-3 mt-0"),
+                        dbc.Button(
+                            "Download Figure",
+                            id="download-pillar-button",
+                            color="success",
+                            outline=True,
+                            size="sm",
+                            className="mt-0"
+                        )
+                    ], style={"display": "flex", "alignItems": "flex-start", "justifyContent": "space-between"}, className="mb-3"),
+                    dcc.Graph(id="pillar-progress-bars", config={'displayModeBar': False},
+                             style={"maxWidth": "100%", "height": "auto", "borderRadius": "8px", "boxShadow": "0 2px 8px rgba(0,0,0,0.1)"}),
+                    dcc.Download(id="download-pillar-image")
                 ], className="mb-4"),
                 
                 # Analysis text
-                html.Div(id="analysis-text", className="mb-4"),
-                
-    
-                # Download buttons
-                dbc.Row([
-                    dbc.Col([
-                        dbc.Button(
-                            "Download Figure",
-                            id="download-button",
-                            color="success",
-                            outline=True,
-                            className="me-2"
-                        ),
-                        dcc.Download(id="download-image")
-                    ], width=12)
-                ], className="mt-4")
+                html.Div(id="analysis-text", className="mb-4")
             ], id="results-section", className="section-2 p-4 border rounded bg-light", style={"display": "none"}),
             
         ], width=12, lg=10)
@@ -497,10 +494,22 @@ def update_results(n_clicks, pasted_data):
         img_str = generate_figure(df)
         
         figure_html = html.Div([
+            html.Div([
+                html.H5("Results by Thematic Area", className="mb-3 mt-0"),
+                dbc.Button(
+                    "Download Figure",
+                    id="download-button",
+                    color="success",
+                    outline=True,
+                    size="sm",
+                    className="mt-0"
+                )
+            ], style={"display": "flex", "alignItems": "flex-start", "justifyContent": "space-between"}, className="mb-3"),
             html.Img(
                 src=f"data:image/png;base64,{img_str}",
                 style={"maxWidth": "100%", "height": "auto", "borderRadius": "8px", "boxShadow": "0 2px 8px rgba(0,0,0,0.1)"}
-            )
+            ),
+            dcc.Download(id="download-image")
         ])
         
         return {"display": "none"}, {"display": "block"}, img_str, figure_html, analysis_text, progress_fig
@@ -529,6 +538,29 @@ def download_figure(n_clicks, img_data):
     return dcc.send_bytes(
         img_bytes,
         filename="DRM_Assessment_Result.png"
+    )
+
+# Callback for downloading the pillar progress bars figure
+@app.callback(
+    Output("download-pillar-image", "data"),
+    Input("download-pillar-button", "n_clicks"),
+    State("pillar-progress-bars", "figure"),
+    prevent_initial_call=True
+)
+def download_pillar_figure(n_clicks, fig_data):
+    """Download the pillar progress bars as PNG"""
+    if fig_data is None:
+        return None
+    
+    # Recreate the figure from the stored data
+    fig = go.Figure(fig_data)
+    
+    # Convert to image bytes
+    img_bytes = fig.to_image(format="png", width=1000, height=max(400, len(fig_data['data'][0]['y']) * 60))
+    
+    return dcc.send_bytes(
+        img_bytes,
+        filename="DRM_Pillar_Progress.png"
     )
 
 # Callback to toggle example collapse
