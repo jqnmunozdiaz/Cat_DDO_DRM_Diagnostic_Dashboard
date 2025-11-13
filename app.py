@@ -127,7 +127,7 @@ app.layout = dbc.Container([
                 ], className="text-muted"),
                 
                 html.Div([
-                    html.Img(src="/assets/images/CatDDO_Policy_Framework.png", 
+                    html.Img(src="/assets/images/Policy_Framework.png", 
                              style={"maxWidth": "100%", "height": "auto", "display": "block", "margin": "0 auto", "marginBottom": "20px"})
                 ], className="text-center mt-3"),
                 
