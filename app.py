@@ -142,20 +142,10 @@ app.layout = dbc.Container([
                 html.H3("Guidelines for Using the Tool", className="mb-3"),
                                 
                 html.P([
-                    "The tool reviews each DRM pillar through a series of closed questions organized under four policy dimensions: (i) ", html.Strong("Legal and institutional setup"), ", (ii) ", html.Strong("Intermediary DRM outputs"), ", (iii) ", html.Strong("Key achievements"), ", and (iv) ", html.Strong("Policy enablers"), "."
+                    "The tool reviews each DRM pillar through a series of closed questions. The tool is structured as an Excel-based policy matrix where each row corresponds to a DRM pillar."
                 ], className="text-muted"),
                 
-                html.P([
-                    "The first three policy dimensions follow the result chain logic used in World Bank Development Policy Financing (DPF) operations—moving from policy inputs and implementation to tangible outcomes that contribute to build disaster resilience. They help assess whether an adequate legal and institutional framework exists, evaluate implementation status using standard DRM intermediary outputs and, eventually, appraising achievements and outcomes using indicators that reflect changes in behaviour, institutions, or systems. The fourth dimension captures the extent to which DRM policies reflect international best practice."
-                ], className="text-muted"),
-                
-                html.P([
-                    "The tool is structured as an Excel-based policy matrix where each row corresponds to a DRM pillar and each column to a policy dimension. Progress across columns indicates the degree of policy maturity of a specific pillar, while progress across rows reflects the extent of DRM mainstreaming across sectors. Together, these dimensions provide key insights into the overall maturity of the national DRM system."
-                ], className="text-muted"),
-                
-                html.H5("Filling in the Excel-based questionnaire", className="mt-3 mb-2"),
-                
-                html.P([
+               html.P([
                     "In this pilot phase, task team can download the Excel version of the tool for offline use. To ensure objectivity and speed, teams are asked to provide a \"Yes\" or \"No\" answer. This answer must be based on official documents that justify the existence of a series of legal, regulatory, institutional and budgetary conditions that are considered fundamental for managing disaster risk."
                 ], className="text-muted"),
                 
@@ -164,7 +154,7 @@ app.layout = dbc.Container([
                 ], className="text-muted"),
                 
                 html.P([
-                    "Once all questions are completed, copy/paste the content of cell D7 below. The system will automatically generate key metrics and visual outputs."
+                    "Once all questions are completed, copy/paste the content of cell E7 below. The system will automatically generate key metrics and visual outputs."
                 ], className="text-muted"),
                 
                 html.P([
@@ -185,7 +175,7 @@ app.layout = dbc.Container([
                 
                 # Paste area to bulk-populate the table
                 html.Div([
-                    html.Label("Please paste the data from cell D7 of your spreadsheet after completing the diagnostic:", className="form-label fw-semibold"),
+                    html.Label("Please paste the data from cell E7 of your spreadsheet after completing the diagnostic:", className="form-label fw-semibold"),
                     dcc.Textarea(id="paste-input", placeholder="",
                                   style={"width": "100%", "height": "110px", "fontFamily": "monospace"}),
                     html.Div([
@@ -198,7 +188,7 @@ app.layout = dbc.Container([
                     dbc.Collapse(
                         [
                             html.P(
-                                "Enter the text in cell D7 following the required format. You can copy and paste the example to proceed.",
+                                "Enter the text in cell E7 following the required format. You can copy and paste the example to proceed.",
                                 className="form-text text-muted mb-2"
                             ),
                             dbc.Card(dbc.CardBody([
@@ -244,7 +234,6 @@ app.layout = dbc.Container([
                     
                     html.Ul([
                         html.Li([html.Strong("Petal length"), " reflects progress in that thematic area: the longer the size of the petal, the more advanced the country is."]),
-                        html.Li([html.Strong("Colors"), " represent the four policy dimensions underpinning the length of each petal."]),
                         html.Li([html.Strong("When a petal extends beyond the red circle"), ", minimum policy requirements for that area are considered in place."]),
                         html.Li([html.Strong("Countries with mature DRM systems"), " typically have most petals exceeding the red circle, with some approaching the frontier (i.e., exhibiting a level of advances close to the global benchmark frontier)."]),
                     ], className="text-muted"),
