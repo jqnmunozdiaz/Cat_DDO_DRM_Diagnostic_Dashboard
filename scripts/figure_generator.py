@@ -227,7 +227,7 @@ def generate_figure(df_input):
     r_circle = np.ones_like(theta_circle)
     
     # Circle at 1...
-    ax.plot(theta_circle, r_circle, color='red', linewidth=1, zorder=5, linestyle='--', label="Nascent", alpha=0.5)
+    ax.plot(theta_circle, r_circle, color='red', linewidth=1.5, zorder=100, linestyle='--', label="Nascent", alpha=0.6)
     ax.plot(theta_circle, 2 * r_circle, color='orange', linewidth=1, zorder=5, linestyle='--', label="Emerging", alpha=0.5)
     ax.plot(theta_circle, 3 * r_circle, color='blue', linewidth=1, zorder=5, linestyle='--', label="Established", alpha=0.5)
     ax.plot(theta_circle, 4 * r_circle, color='green', linewidth=1, zorder=5, linestyle='--', label="Mature", alpha=0.5)
