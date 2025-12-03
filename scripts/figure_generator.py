@@ -9,6 +9,7 @@ matplotlib.use('Agg')  # Use non-interactive backend for web applications
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 import base64
 from io import BytesIO
 
@@ -29,9 +30,6 @@ def generate_figure(df_input):
     # Remove completely empty rows
     df_raw = df_raw[df_raw["DRM Pillar"].notna() | df_raw["Thematic Area"].notna()].copy()
     
-    # Define the assessment category columns
-    value_cols = [col for col in df_raw.columns if col not in ["DRM Pillar", "Thematic Area"]]
-    
     # Create labels
     df_raw["individual"] = df_raw.apply(
         lambda row: row["Thematic Area"].strip() 
@@ -46,7 +44,10 @@ def generate_figure(df_input):
     # Remove rows without labels
     df_raw = df_raw[df_raw["individual"] != ""].copy()
     
-    # Convert values to numeric
+    # Get value columns (everything except DRM Pillar and Thematic Area)
+    value_cols = [col for col in df_raw.columns if col not in ["DRM Pillar", "Thematic Area", "individual", "group"]]
+    
+    # Convert values to numeric and sum them
     for col in value_cols:
         df_raw[col] = pd.to_numeric(
             df_raw[col].astype(str).str.strip().replace("-", "0"), 
@@ -54,38 +55,22 @@ def generate_figure(df_input):
             downcast='float'
         )
     
+    # Calculate total value for each row
+    df_raw["total_value"] = df_raw[value_cols].sum(axis=1)
+    
     # Keep only needed columns
-    df = df_raw[["individual", "group"] + value_cols].copy()
+    df = df_raw[["individual", "group", "total_value"]].copy()
     df = df.sort_values(["group", "individual"]).reset_index(drop=True)
     
-    # Reshape to long format
-    df_long = df.melt(
-        id_vars=["individual", "group"], 
-        value_vars=value_cols,
-        var_name="observation", 
-        value_name="value"
-    )
-    
-    obs_types = len(value_cols)
-    df_long = df_long.sort_values(["group", "individual"]).reset_index(drop=True)
-    
-    # Assign unique ID to each bar position
-    ids = np.repeat(np.arange(1, int(df_long.shape[0] / obs_types) + 1), obs_types)
-    df_long = df_long.iloc[:len(ids)].copy()
-    df_long["id"] = ids
-    
     # Remove leading numbers from names
-    df_long["individual"] = df_long["individual"].str.replace(r'\d+', '', regex=True)
-    df_long["individual"] = df_long["individual"].str.replace('.', '', regex=False)
-    df_long["individual"] = df_long["individual"].str.strip()
-    df_long["group"] = df_long["group"].str.replace(r'^\d+\.\s*', '', regex=True)
-    
-    # Create label data
-    label_data = df_long.groupby(["id", "individual"], sort=False)["value"].sum().reset_index()
-    label_data["individual"] = label_data["individual"].fillna("")
+    df["individual"] = df["individual"].str.replace(r'\d+', '', regex=True)
+    df["individual"] = df["individual"].str.replace('.', '', regex=False)
+    df["individual"] = df["individual"].str.strip()
+    df["group"] = df["group"].str.replace(r'^\d+\.\s*', '', regex=True)
+    df["individual"] = df["individual"].fillna("")
     
     # Calculate positions
-    number_of_bars = len(label_data)
+    number_of_bars = len(df)
     number_of_groups = 6
     gap_width_ratio = 0.5
     
@@ -112,42 +97,44 @@ def generate_figure(df_input):
     ax.set_theta_direction(-1)
     ax.set_theta_zero_location('N')
     
-    # Get colors for each category
-    cmap = plt.get_cmap("viridis", len(value_cols))
+    # Get heights for bars
+    heights = df["total_value"].values
     
-    # Plot each category as a stacked layer
-    for i, (obs, color) in enumerate(zip(value_cols, cmap(np.linspace(0, 1, len(value_cols))))):
-        obs_df = df_long[df_long["observation"] == obs].copy()
-        
-        heights = []
-        for idx in range(1, number_of_bars + 1):
-            subset = obs_df[obs_df["id"] == idx]
-            val = subset["value"].values[0] if len(subset) else 0
-            heights.append(0 if np.isnan(val) else val)
-        heights = np.array(heights)
-        
-        if i == 0:
-            bottom = np.zeros_like(heights)
-        else:
-            bottom = bottom + prev_heights
-        
-        ax.bar(
-            angles, heights, 
-            width=width, 
-            bottom=bottom, 
-            align="edge",
-            color=color, 
-            edgecolor="none", 
-            alpha=0.9, 
-            label=obs,
-            zorder=10,
-        )
-        
-        prev_heights = heights
+    # Use viridis colormap
+    cmap_gradient = plt.get_cmap('viridis')
+    
+    # Plot bars with vertical gradient based on absolute height (0-4 scale)
+    max_scale = 4  # Maximum value on the scale
+    
+    for i, (angle, height) in enumerate(zip(angles, heights)):
+        if height > 0:
+            # Create stacked segments to simulate gradient
+            n_segments = 50
+            segment_height = height / n_segments
+            
+            for j in range(n_segments):
+                # Color based on absolute height value (0 to 4)
+                # Use center of segment for more accurate color
+                absolute_position = ((j + 0.5) / n_segments) * height
+                color_position = absolute_position / max_scale  # Normalize to 0-1 based on max scale
+                color_position = min(color_position, 1.0)  # Cap at 1.0
+                color = cmap_gradient(color_position)
+                
+                ax.bar(
+                    angle, segment_height, 
+                    width=width, 
+                    bottom=j * segment_height, 
+                    align="edge",
+                    color=color, 
+                    edgecolor=color, 
+                    linewidth=0.5,
+                    alpha=1.0,
+                    zorder=10,
+                )
     
     # Configure radial axis
     radial_ticks = [0, 1, 2, 3, 4]
-    max_value = df_long.groupby("id")["value"].sum().max()
+    max_value = df["total_value"].max()
     ax.set_ylim(-0.5, max(max_value * 1.2, 4))
     ax.set_yticks(radial_ticks)
     ax.set_yticklabels([str('') for r in radial_ticks], fontsize=10, color="grey")
@@ -199,11 +186,11 @@ def generate_figure(df_input):
          'Resilient reconstruction': 'Resilient\nreconstruction'}
     
     for old, new in d.items():
-        label_data["individual"] = label_data["individual"].astype(str).str.replace(old, new, regex=False)
+        df["individual"] = df["individual"].astype(str).str.replace(old, new, regex=False)
     
-    for i, row in label_data.iterrows():
+    for i, row in df.iterrows():
         angle = angles[i] + width / 2
-        total_y = df_long[df_long["id"] == (i + 1)]["value"].sum(skipna=True)
+        total_y = row["total_value"]
         name = row["individual"]
         c = "black"
         if total_y < 1:
@@ -235,22 +222,18 @@ def generate_figure(df_input):
     
     ax.set_frame_on(False)
     
-    # Add minimum standard circle
+    # Add standard circles with labels
     theta_circle = np.linspace(0, 2 * np.pi, 100)
     r_circle = np.ones_like(theta_circle)
-    ax.plot(theta_circle, r_circle, color='red', linewidth=1, zorder=5, linestyle='--', label="Minimum standard")
     
-    # Finalize legend
-    handles, labels = ax.get_legend_handles_labels()
-    if "Minimum standard" in labels:
-        i = labels.index("Minimum standard")
-        h = handles.pop(i)
-        l = labels.pop(i)
-        insert_pos = 1 if len(labels) >= 1 else 0
-        handles.insert(insert_pos, h)
-        labels.insert(insert_pos, l)
+    # Circle at 1...
+    ax.plot(theta_circle, r_circle, color='red', linewidth=1, zorder=5, linestyle='--', label="Nascent", alpha=0.5)
+    ax.plot(theta_circle, 2 * r_circle, color='orange', linewidth=1, zorder=5, linestyle='--', label="Emerging", alpha=0.5)
+    ax.plot(theta_circle, 3 * r_circle, color='blue', linewidth=1, zorder=5, linestyle='--', label="Established", alpha=0.5)
+    ax.plot(theta_circle, 4 * r_circle, color='green', linewidth=1, zorder=5, linestyle='--', label="Mature", alpha=0.5)
     
-    ax.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, -0.1), ncols=4, fontsize=8, frameon=False)
+    # Add legend
+    ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.1), ncols=4, fontsize=8, frameon=False)
     plt.subplots_adjust(top=0.95, bottom=0.15)
     
     # Convert to base64

@@ -538,19 +538,27 @@ def download_figure(n_clicks, img_data):
 )
 def download_pillar_figure(n_clicks, fig_data):
     """Download the pillar progress bars as PNG"""
-    if fig_data is None:
+    if fig_data is None or not n_clicks:
         return None
     
-    # Recreate the figure from the stored data
-    fig = go.Figure(fig_data)
-    
-    # Convert to image bytes
-    img_bytes = fig.to_image(format="png", width=1000, height=max(400, len(fig_data['data'][0]['y']) * 60))
-    
-    return dcc.send_bytes(
-        img_bytes,
-        filename="DRM_Pillar_Progress.png"
-    )
+    try:
+        # Recreate the figure from the stored data
+        fig = go.Figure(fig_data)
+        
+        # Calculate height based on number of bars
+        num_bars = len(fig_data['data'][0]['y']) if fig_data.get('data') and len(fig_data['data']) > 0 else 6
+        height = max(400, num_bars * 60)
+        
+        # Convert to image bytes
+        img_bytes = fig.to_image(format="png", width=1000, height=height)
+        
+        return dcc.send_bytes(
+            img_bytes,
+            filename="DRM_Pillar_Progress.png"
+        )
+    except Exception as e:
+        print(f"Error downloading pillar figure: {str(e)}")
+        return None
 
 # Callback to toggle example collapse
 @app.callback(
