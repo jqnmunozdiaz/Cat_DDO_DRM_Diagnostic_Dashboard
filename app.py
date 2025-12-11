@@ -10,10 +10,13 @@ import pandas as pd
 from scripts.petal_chart_figure_generator import generate_figure
 from scripts.pillar_chart import generate_pillar_chart
 from utils.data_parser import parse_pasted_data
+from config.question_config import THEMATIC_AREA_QUESTIONS, parse_question_range
 import plotly.graph_objects as go
 import base64
 import os
 import re
+import json
+from pathlib import Path
 
 # Initialize the Dash app
 app = dash.Dash(
@@ -25,6 +28,68 @@ app = dash.Dash(
     suppress_callback_exceptions=True
 )
 server = app.server
+
+# Helper functions
+def generate_answer_indicator(question_data, thematic_area):
+    """Generate binary indicator string (e.g., '1010') for a thematic area based on answers"""
+    # Find the question range for this thematic area
+    for area_config in THEMATIC_AREA_QUESTIONS:
+        if area_config["thematic"] == thematic_area:
+            question_ids = parse_question_range(area_config["questions"])
+            # Generate binary string: 1 for Yes, 0 for No
+            indicator = ""
+            for q_id in question_ids:
+                if q_id in question_data:
+                    indicator += "1" if question_data[q_id]["answer"].lower() == "yes" else "0"
+                else:
+                    indicator += "0"  # Default to No if question not found
+            return indicator
+    return None
+
+def load_thematic_summary(thematic_area, indicator):
+    """Load LLM-generated summary from JSON file based on thematic area and answer indicator"""
+    try:
+        # Special handling for 3.3 which has 10 questions split into 2 parts
+        if thematic_area == "3.3. Sector-specific risk reduction measures" and len(indicator) == 10:
+            # Split indicator into two parts: first 5 and last 5 questions
+            indicator_part1 = indicator[:5]
+            indicator_part2 = indicator[5:]
+            
+            # Load from part1 JSON
+            json_file_part1 = Path("LLM") / f"{thematic_area}_part1.json"
+            summary_part1 = "Summary for part 1 will be available soon."
+            if json_file_part1.exists():
+                with open(json_file_part1, 'r', encoding='utf-8') as f:
+                    summaries_part1 = json.load(f)
+                summary_part1 = summaries_part1.get(indicator_part1, "Summary content for this response pattern will be available soon.")
+            
+            # Load from part2 JSON
+            json_file_part2 = Path("LLM") / f"{thematic_area}_part2.json"
+            summary_part2 = "Summary for part 2 will be available soon."
+            if json_file_part2.exists():
+                with open(json_file_part2, 'r', encoding='utf-8') as f:
+                    summaries_part2 = json.load(f)
+                summary_part2 = summaries_part2.get(indicator_part2, "Summary content for this response pattern will be available soon.")
+            
+            # Combine summaries
+            return f"{summary_part1} {summary_part2}"
+        
+        # Regular handling for other thematic areas
+        # Construct file path
+        json_file = Path("LLM") / f"{thematic_area}.json"
+        
+        if not json_file.exists():
+            return "Summary content will be available soon."
+        
+        # Load JSON file
+        with open(json_file, 'r', encoding='utf-8') as f:
+            summaries = json.load(f)
+        
+        # Get summary for this indicator pattern
+        summary = summaries.get(indicator, "Summary content for this response pattern will be available soon.")
+        return summary
+    except Exception as e:
+        return f"Error loading summary: {str(e)}"
 
 # App layout
 app.layout = dbc.Container([
@@ -101,6 +166,55 @@ app.layout = dbc.Container([
             
             # Section 1: Input Form
             html.Div([
+                # Country selection dropdown
+                dbc.Row([
+                    dbc.Col([
+                        html.Label("Select Country:", className="fw-bold mb-2"),
+                        dcc.Dropdown(
+                            id="country-dropdown",
+                            options=[
+                                {"label": country, "value": country} for country in [
+                                    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
+                                    "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain",
+                                    "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
+                                    "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria",
+                                    "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada",
+                                    "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros",
+                                    "Congo (Republic of)", "Congo (DRC)", "Costa Rica", "Croatia", "Cuba",
+                                    "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic",
+                                    "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia",
+                                    "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia",
+                                    "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau",
+                                    "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran",
+                                    "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan",
+                                    "Kenya", "Kiribati", "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon",
+                                    "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg",
+                                    "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands",
+                                    "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia",
+                                    "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal",
+                                    "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea",
+                                    "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama",
+                                    "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar",
+                                    "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia",
+                                    "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe",
+                                    "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore",
+                                    "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea",
+                                    "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland",
+                                    "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo",
+                                    "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
+                                    "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States",
+                                    "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Vietnam",
+                                    "Yemen", "Zambia", "Zimbabwe"
+                                ]
+                            ],
+                            value="Angola",
+                            placeholder="Select a country...",
+                            clearable=False,
+                            className="mb-3"
+                        )
+                    ], width=12)
+                ], className="mb-3"),
+                
                 # Download template button
                 dbc.Row([
                     dbc.Col([
@@ -210,7 +324,22 @@ app.layout = dbc.Container([
                 ], className="mb-4"),
                 
                 # Analysis text
-                html.Div(id="analysis-text", className="mb-4")
+                html.Div(id="analysis-text", className="mb-4"),
+                
+                # Summary by Thematic Area section
+                html.Div([
+                    html.H4("Summary by Thematic Area", className="mb-3"),
+                    html.Div([
+                        html.P([
+                            html.I(className="fas fa-info-circle me-2"),
+                            "This text was generated automatically by a Large Language Model (LLM). Users should verify the content and cross-reference with official documentation."
+                        ], className="text-muted fst-italic small mb-3", style={"backgroundColor": "#fff3cd", "padding": "10px", "borderRadius": "5px", "border": "1px solid #ffc107"})
+                    ]),
+                    
+                    # Dynamic summaries container
+                    html.Div(id="thematic-summaries-container")
+                    
+                ], className="mb-4")
             ], id="results-section", className="section-2 p-4 border rounded", style={"display": "none", "backgroundColor": "#f8f9fa"}),
             
         ], width=12, lg=10)
@@ -234,11 +363,15 @@ app.layout = dbc.Container([
 def handle_paste(n_clicks, raw_text):
     if not n_clicks:
         raise dash.exceptions.PreventUpdate
-    df_parsed, status = parse_pasted_data(raw_text or "")
-    if df_parsed is None:
-        return dash.no_update, html.Div(status, className="alert alert-danger")
-    # Serialize parsed dataframe (pillar, thematic, score)
-    serialized = df_parsed.to_dict('records')
+    result = parse_pasted_data(raw_text or "")
+    if result[0] is None:
+        return dash.no_update, html.Div(result[-1], className="alert alert-danger")
+    df_parsed, question_data, status = result
+    # Serialize parsed dataframe (pillar, thematic, score) and question answers
+    serialized = {
+        'df': df_parsed.to_dict('records'),
+        'questions': question_data
+    }
     return serialized, html.Div(status, className="alert alert-success")
 
 # Callback to generate results on paste or See Results button
@@ -248,24 +381,27 @@ def handle_paste(n_clicks, raw_text):
      Output("figure-store", "data"),
      Output("figure-container", "children"),
      Output("analysis-text", "children"),
-     Output("pillar-progress-bars", "figure")],
+     Output("pillar-progress-bars", "figure"),
+     Output("thematic-summaries-container", "children")],
     Input("paste-apply", "n_clicks"),
     Input("pasted-data", "data"),
+    State("country-dropdown", "value"),
     prevent_initial_call=True
 )
-def update_results(n_clicks, pasted_data):
+def update_results(n_clicks, pasted_data, country):
     """Process pasted data and generate figure"""
     if not pasted_data:
         raise dash.exceptions.PreventUpdate
     
     # Build dataframe from pasted data
-    df = pd.DataFrame(pasted_data)
+    df = pd.DataFrame(pasted_data['df'])
+    question_data = pasted_data['questions']
     
     # Analyze results - find areas below minimum standard (1.0)
     below_minimum = []
     
     for idx, row in df.iterrows():
-        if row["Score"] < 1.0:
+        if row["Score"] < 0.25:
             thematic = row["Thematic Area"]
             # Remove leading numbers from thematic area name
             clean_thematic = thematic.split('. ', 1)[1] if '. ' in thematic else thematic
@@ -299,6 +435,34 @@ def update_results(n_clicks, pasted_data):
     # Generate pillar progress chart
     progress_fig = generate_pillar_chart(df)
     
+    # Generate thematic area summaries
+    thematic_summaries = []
+    for area_config in THEMATIC_AREA_QUESTIONS:
+        thematic_name = area_config["thematic"]
+        # Generate indicator for this thematic area
+        indicator = generate_answer_indicator(question_data, thematic_name)
+        # Load summary from JSON
+        summary_text = load_thematic_summary(thematic_name, indicator)
+        
+        # Replace {country} placeholder with actual country name
+        if country:
+            summary_text = summary_text.replace("{country}", country)
+        
+        # Create summary HTML
+        # Remove leading numbers from thematic area name
+        clean_thematic = thematic_name.split('. ', 1)[1] if '. ' in thematic_name else thematic_name
+        
+        # Check if this area is below minimum standard
+        is_below_minimum = clean_thematic in below_minimum
+        title_style = {"color": "red"} if is_below_minimum else {}
+        
+        thematic_summaries.append(
+            html.Div([
+            html.P(html.Strong(clean_thematic, style=title_style), className="mb-2"),
+            html.P(summary_text, className="text-muted")
+            ], className="mb-3")
+        )
+    
     # Generate circular figure
     try:
         img_str = generate_figure(df)
@@ -322,11 +486,11 @@ def update_results(n_clicks, pasted_data):
             dcc.Download(id="download-image")
         ])
         
-        return {"display": "none"}, {"display": "block"}, img_str, figure_html, analysis_text, progress_fig
+        return {"display": "none"}, {"display": "block"}, img_str, figure_html, analysis_text, progress_fig, thematic_summaries
     except Exception as e:
         return {"display": "none"}, {"display": "block"}, None, html.Div([
             html.Div(f"Error generating figure: {str(e)}", className="alert alert-danger")
-        ]), "", go.Figure()
+        ]), "", go.Figure(), []
         
     
 

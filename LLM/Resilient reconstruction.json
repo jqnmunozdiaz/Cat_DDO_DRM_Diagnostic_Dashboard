@@ -1,0 +1,10 @@
+{
+    "000": "In {country}, there are no laws or regulations defining post-disaster recovery institutions, no review of planning instruments after disasters, and no guidelines for damage and needs assessments. Resilient reconstruction capacity is very limited.",
+    "001": "In {country}, guidelines for post-disaster assessments exist, but institutions are undefined and planning instruments have not been reviewed. Assessment tools exist, but governance and practical application are weak.",
+    "010": "In {country}, planning instruments have been reviewed after disasters, but no legal framework or assessment guidelines exist. Some practical reconstruction steps are taken, yet institutional anchoring and systematic assessment are missing.",
+    "011": "In {country}, planning instruments are reviewed and assessment guidelines exist, but institutions are not defined. Reconstruction shows operational measures and assessment capacity, but lacks formal governance.",
+    "100": "In {country}, institutions for coordinating post-disaster recovery are defined by law or regulation, but planning instruments have not been reviewed and assessment guidelines are missing. Governance exists, but operational and analytical capacity is limited.",
+    "101": "In {country}, institutions are defined and assessment guidelines exist, but planning instruments have not been reviewed. Governance and assessment capacity are in place, yet practical reconstruction improvements are incomplete.",
+    "110": "In {country}, institutions are defined and planning instruments have been reviewed, but guidelines for assessments are missing. Governance and operational review are strong, but systematic assessment is lacking.",
+    "111": "In {country}, post-disaster recovery institutions are legally defined, planning instruments have been reviewed, and guidelines for damage and needs assessments are in place. Resilient reconstruction in {country} is well-coordinated, systematic, and guided by both governance and technical standards."
+}

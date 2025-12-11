@@ -1,0 +1,10 @@
+{
+    "000": "In {country}, there are no sovereign risk financing instruments, no regulations defining catastrophe insurance standards, and no increase in available disaster financing. The country lacks financial tools to manage the fiscal impact of disasters and climate-related shocks.",
+    "001": "In {country}, available financing has increased, but there are no sovereign risk instruments or regulations for catastrophe insurance. Some financial capacity exists, yet overall preparedness and regulatory coverage remain limited.",
+    "010": "In {country}, regulations defining insurance standards exist, but sovereign risk instruments are absent and financing has not increased. Regulatory foundations are present, but practical financial tools and mobilization remain weak.",
+    "011": "In {country}, insurance regulations exist and financing has increased, but sovereign risk instruments are lacking. Some financial and regulatory mechanisms exist, yet the absence of formal instruments limits effectiveness.",
+    "100": "In {country}, sovereign risk financing instruments are in place, but there are no insurance regulations and no increase in financing over the past four years. Financial tools exist, but regulatory guidance and growth in resources are limited.",
+    "101": "In {country}, sovereign risk instruments exist and financing has increased, but there are no regulations defining insurance standards. Tools and resources are improving, but regulatory frameworks for coverage are missing.",
+    "110": "In {country}, sovereign risk instruments and insurance regulations exist, but financing has not increased. The country has financial and regulatory mechanisms, but resource mobilization remains stagnant.",
+    "111": "In {country}, sovereign risk financing instruments, insurance regulations, and increased available financing are all in place. The country demonstrates strong financial preparedness to manage the impact of disasters and climate-related shocks."
+}

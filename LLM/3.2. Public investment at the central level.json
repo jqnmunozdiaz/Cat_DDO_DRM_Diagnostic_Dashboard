@@ -1,0 +1,11 @@
+{
+    "000": "In {country}, there are no legal requirements, official guidelines, or mandatory risk mitigation measures for public investment projects. Disaster and climate risk are largely ignored in project appraisal, posing potential exposure to high-risk investments.",
+    "001": "In {country}, risk mitigation measures are required for high-risk projects, but there are no laws mandating risk screening or official guidelines. Some projects are safeguarded, but the process is ad hoc and not systematically integrated into public investment appraisal.",
+    "010": "In {country}, official guidelines for disaster and climate risk screening exist, but there is no legal mandate and mitigation measures are not required. Guidance is available, yet compliance and enforcement are limited, reducing practical impact.",
+    "011": "In {country}, guidelines exist and mitigation measures are required for high-risk projects, but no laws mandate risk screening. Risk management occurs in practice, but the absence of a legal framework limits consistency and coverage.",
+    "100": "In {country}, laws mandate disaster and climate risk screening for new public investment projects, but guidelines are missing and mitigation measures are not required. Legal requirements exist, but practical implementation and technical guidance are incomplete.",
+    "101": "In {country}, laws mandate risk screening and mitigation measures are required for high-risk projects, but official guidelines are missing. Legal enforcement ensures some protection, though the process lacks standardized methodologies.",
+    "110": "In {country}, laws and official guidelines exist for disaster and climate risk screening, but mitigation measures are not mandatory. Screening is legally and technically supported, yet high-risk projects may still proceed without guaranteed risk reduction.",
+    "111": "In {country}, laws, guidelines, and mandatory mitigation measures are all in place for public investment projects. Disaster and climate risk are fully integrated into project appraisal, ensuring high-risk projects are systematically identified and managed."
+}
+

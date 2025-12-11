@@ -81,4 +81,4 @@ def parse_pasted_data(raw_text: str):
         })
     
     df = pd.DataFrame(records)
-    return df, "Parsed successfully, please wait..."
+    return df, question_data, "Parsed successfully, please wait..."

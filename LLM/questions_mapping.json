@@ -1,0 +1,73 @@
+{
+  "1.1. DRM policies and institutions": {
+    "Q1": "Is there a legal framework (e.g., a DRM law or other legally-binding instruments) defining distinct responsibilities for disaster risk reduction and emergency management?",
+    "Q2": "Did the institution responsible for coordinating or leading DRM activities receive dedicated funding for these functions in the last fiscal year?",
+    "Q3": "Have DRM policy instruments (e.g., DRM strategies or policies) been officially approved since the adoption of the DRM legal framework?",
+    "Q4": "Have DRM-related regulations (e.g., rules on the structure or functions of the DRM agency) been officially approved since the adoption of the DRM legal framework?"
+  },
+  "1.2. Mainstreaming DRM into national and sectoral development plans": {
+    "Q5": "Does the National Development Strategy (or equivalent national planning instrument) contain objectives, targets or indicators related to DRM and/or Climate Change Adaptation?",
+    "Q6": "Have at least 50% of essential government entities* included explicit DRM and/or Climate Change Adaptation targets and indicators in their most recent strategic planning documents?"
+  },
+  "2. Risk Identification": {
+    "Q7": "Do laws and regulations clearly define institutional responsibilities and mandates for producing, acquiring, and managing geospatial information, including risk information (e.g., hazard information, vulnerability assessments, risk profiles, historical disaster databases)?",
+    "Q8": "Is existing hazard and risk information available to all essential government entities (e.g., as evidenced through a set of MoUs or formal exchange mechanisms)?",
+    "Q9": "Is existing hazard and risk information accessible to all citizens through open-data platforms?",
+    "Q10": "Do available national risk assessments or disaster risk profiles account for the potential impacts of climate change on hazard intensity and frequency?"
+  },
+  "3.1. Territorial and urban planning": {
+    "Q11": "Do laws and regulations mandate the use of risk information (e.g., hazard maps, risk assessments) to develop territorial, spatial, land use, or urban planning instruments?",
+    "Q12": "Do official methodologies to guide the development of risk-informed territorial, spatial, land use or urban planning instruments exist?",
+    "Q13": "Do guidelines or procedures for managing housing/settlements located in high-risk areas exist?",
+    "Q14": "Have at least 50% of the instruments (territorial, spatial, land use or urban planning) approved in the last four years used risk information (e.g., hazard maps, risk assessments)?"
+  },
+  "3.2. Public investment at the central level": {
+    "Q15": "Do laws and regulations mandate disaster and climate risk screening as part of the appraisal of new public investment projects?",
+    "Q16": "Do official guidelines exist defining disaster and climate risk screening methodologies for new public investment projects?",
+    "Q17": "Are risk mitigation measures mandatory for new projects that have been appraised as high-risk (or equivalent) through the disaster and climate screening process?"
+  },
+  "3.3. Sector-specific risk reduction measures": {
+    "Q18": "Are there legally binding standards or technical guidelines for the design and construction of disaster-resilient critical infrastructure in the following sectors: (1) transport (roads)",
+    "Q19": "Are there legally binding standards or technical guidelines for the design and construction of disaster-resilient critical infrastructure in the following sectors: (2) education (schools)",
+    "Q20": "Are there legally binding standards or technical guidelines for the design and construction of disaster-resilient critical infrastructure in the following sectors: (3) health (hospitals)",
+    "Q21": "Are there legally binding standards or technical guidelines for the design and construction of disaster-resilient critical infrastructure in the following sectors: (4) energy infrastructure?",
+    "Q22": "Is there at least one legally binding building code or standard that requires earthquake-resistant or other hazard-resistant (e.g., wind, flood) design for buildings?",
+    "Q23": "Has any public project or program in the past four years been allocated funding for retrofitting activities that follow vulnerability assessments and resilient design standards?",
+    "Q24": "Are there legal and institutional arrangements for water supply and sanitation in urban areas that take flood risk into account?",
+    "Q25": "Are there legal and institutional arrangements for integrated water resources management that explicitly incorporate flood and drought risk considerations?",
+    "Q26": "Have any watershed basins undergone improvements in water management in the last four years?",
+    "Q27": "Has the percentage of urban residents with access to sewage services been maintained or increased in the last four years?"
+  },
+  "4.1. Early Warning Systems (EWS)": {
+    "Q28": "Do institutions involved in EWS—data producers, decision-makers, and implementers of preparedness and response—operate under an established, functional coordination mechanism, evidenced by formal arrangements such as MoUs or regular coordination platform meetings?",
+    "Q29": "Over the most recent major disaster, was the population promptly alerted (e.g., via SMS or other tailored communication channels)?",
+    "Q30": "Over the past four years, has there been at least one budget allocation for the expansion, maintenance, or operation of the hydrometeorological network?"
+  },
+  "4.2. Emergency Preparedness and Response (EP&R)": {
+    "Q31": "Is there a legal framework for EP&R clearly defining the roles and responsibilities of institutions involved in disaster management?",
+    "Q32": "Do at least 50% of essential government entities have an emergency response protocol or operational continuity plan?",
+    "Q33": "Do at least 50% of subnational EP&R entities (e.g., Local Emergency Management Committee) have an approved contingency plan or emergency response protocol?",
+    "Q34": "Do emergency preparedness plans incorporate gender-sensitive measures, such as gender-based violence prevention, safe shelters, and women's specific needs during evacuation and displacement?"
+  },
+  "4.3. Adaptive Social Protection (ASP)": {
+    "Q35": "Is there a legal framework clearly defining the roles and responsibilities of institutions involved in ASP (e.g., social protection, finance, DRM)?",
+    "Q36": "Is there a unified social registry incorporating exposure and vulnerability data to facilitate the targeting of population potentially affected in case of disaster or climate-related shocks?",
+    "Q37": "During the most recent disaster or climate-related shock, was support promptly provided to the population through social‐protection programs? (e.g., cash transfers in the case of flood/drought)?"
+  },
+  "5.1. Fiscal risk management": {
+    "Q38": "Has the Ministry of Finance created or tasked an existing institutional structure (e.g., department, unit, committee) to manage contingent liabilities and/or fiscal risks, explicitly including those associated with disasters and/or climate-related shocks?",
+    "Q39": "Are contingent liabilities associated with disasters quantified through an established methodology for the major hazards?",
+    "Q40": "Do key fiscal policy documents (e.g., the medium-term fiscal framework or fiscal risk statements) include quantified assessments of disaster risks?",
+    "Q41": "Has the government conducted stress tests of public debt that include disaster or climate-related scenarios?"
+  },
+  "5.2. Disaster Risk Financing (DRF) strategies and instruments": {
+    "Q42": "Are there sovereign risk financing instruments (e.g., disaster or emergency funds, contingent loans, insurance, cat bonds) in place to manage the financial impact of disasters and climate-related shocks?",
+    "Q43": "Are there regulations that define standards for catastrophe insurance coverage of public or private assets?",
+    "Q44": "Over the past four years, has the $ amount of financing that can be mobilized through sovereign risk financing instruments increased?"
+  },
+  "6. Resilient Reconstruction": {
+    "Q45": "Are there laws or regulations that establish the institutions responsible for coordinating post-disaster recovery and reconstruction?",
+    "Q46": "After the most recent major disaster, have the zoning, land use or territorial planning instruments in the affected areas been reviewed to build back better?",
+    "Q47": "Have guidelines or regulations to conduct post-disaster damage and needs assessments been developed and approved?"
+  }
+}
