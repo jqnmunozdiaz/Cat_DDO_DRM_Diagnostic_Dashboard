@@ -57,7 +57,7 @@ def generate_pillar_chart(df: pd.DataFrame) -> go.Figure:
     
     progress_fig.update_layout(
         xaxis=dict(
-            title="Achievement (%)",
+            title="Achievement",
             range=[0, 105],  # Extended slightly beyond 100 to show the 100% gridline
             showgrid=True,
             gridcolor='lightgray',
