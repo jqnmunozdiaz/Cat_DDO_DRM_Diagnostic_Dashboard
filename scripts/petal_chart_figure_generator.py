@@ -26,7 +26,8 @@ def generate_figure(df_input):
     df = df_input.copy()
     
     # Scale normalized scores (0-1) to chart scale (0-4)
-    df["Score"] = df["Score"] * 4.0
+    max_scale = 4  # Maximum value on the scale
+    df["Score"] = df["Score"] * max_scale
     
     # Remove leading numbers from names for display
     df["Thematic Area"] = df["Thematic Area"].str.replace(r'\d+', '', regex=True)
@@ -70,9 +71,20 @@ def generate_figure(df_input):
     cmap_gradient = plt.get_cmap('viridis')
     
     # Plot bars with vertical gradient based on absolute height (0-4 scale)
-    max_scale = 4  # Maximum value on the scale
     
     for i, (angle, height) in enumerate(zip(angles, heights)):
+        # Draw full background bar (transparent with white border)
+        ax.bar(
+            angle, height,
+            width=width,
+            bottom=0,
+            align="edge",
+            facecolor='none',
+            edgecolor='white',
+            linewidth=0.5,
+            zorder=11,
+        )
+        
         if height > 0:
             # Create stacked segments to simulate gradient
             n_segments = 200
@@ -130,8 +142,12 @@ def generate_figure(df_input):
         ax.plot([separator_theta, separator_theta], [0, max_radius], 
                 color='gray', linewidth=1, alpha=0.2, zorder=15)
         
+        # Determine title distance based on max score in this group
+        group_max_score = df[df["DRM Pillar"] == g]["Score"].max()
+        title_distance = 5.2 if group_max_score >= 4 else 4.7
+        
         ax.text(
-            (theta_start + theta_end) / 2, 4.7, title_texts[i],
+            (theta_start + theta_end) / 2, title_distance, title_texts[i],
             ha='center', va='center',
             fontsize=8, fontweight='bold', alpha=0.9
         )
@@ -184,7 +200,7 @@ def generate_figure(df_input):
                 alpha=0.7, 
                 fontweight="bold",
                 color=c,
-                bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor='none', alpha=1),
+                bbox=dict(boxstyle='round,pad=0.1', facecolor='white', edgecolor='none', alpha=0.9),
                 zorder=9
             )
     
@@ -195,13 +211,13 @@ def generate_figure(df_input):
     r_circle = np.ones_like(theta_circle)
     
     # Circle at 1...
-    ax.plot(theta_circle, r_circle, color='red', linewidth=1.5, zorder=100, linestyle='--', label="Nascent", alpha=0.6)
+    ax.plot(theta_circle, r_circle, color='red', linewidth=1, zorder=5, linestyle='--', label="Nascent", alpha=0.5)
     ax.plot(theta_circle, 2 * r_circle, color='orange', linewidth=1, zorder=5, linestyle='--', label="Emerging", alpha=0.5)
     ax.plot(theta_circle, 3 * r_circle, color='blue', linewidth=1, zorder=5, linestyle='--', label="Established", alpha=0.5)
     ax.plot(theta_circle, 4 * r_circle, color='green', linewidth=1, zorder=5, linestyle='--', label="Mature", alpha=0.5)
     
     # Add legend
-    ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.1), ncols=4, fontsize=8, frameon=False)
+    ax.legend(loc="upper right", ncols=1, fontsize=8, frameon=True, borderpad=1.2, labelspacing=0.8)
     plt.subplots_adjust(top=0.95, bottom=0.15)
     
     # Convert to base64

@@ -4,6 +4,8 @@ Generate pillar progress bar chart
 
 import plotly.graph_objects as go
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
 def generate_pillar_chart(df: pd.DataFrame) -> go.Figure:
     """
@@ -19,7 +21,7 @@ def generate_pillar_chart(df: pd.DataFrame) -> go.Figure:
     pillar_scores = {}
     for pillar in df["DRM Pillar"].unique():
         pillar_rows = df[df["DRM Pillar"] == pillar]
-        # Average of thematic area scores within this pillar
+        # Simple average: each thematic area contributes equally to pillar score
         avg_score = pillar_rows["Score"].mean()
         # Convert to percentage for display
         pillar_scores[pillar] = avg_score * 100
@@ -28,27 +30,27 @@ def generate_pillar_chart(df: pd.DataFrame) -> go.Figure:
     pillars = list(pillar_scores.keys())
     scores = [pillar_scores[p] for p in pillars]
     
-    # Determine colors based on score (red if <25%, orange if <50%, yellow if <75%, blue if >=75%)
+    # Remove leading numbers from pillar names for display
+    pillar_labels = [p.split('. ', 1)[1] if '. ' in p else p for p in pillars]
+    
+    # Use viridis colormap for continuous colors based on score (0-100)
+    cmap = plt.get_cmap('viridis')
     colors = []
     for score in scores:
-        if score < 25:
-            colors.append('#dc3545')  # red
-        elif score < 50:
-            colors.append('#fd7e14')  # orange
-        elif score < 75:
-            colors.append('#ffc107')  # yellow
-        else:
-            colors.append('#0d6efd')  # blue
+        # Normalize score (0-100) to colormap range (0-1)
+        color_position = score / 100
+        rgba = cmap(color_position)
+        # Convert matplotlib RGBA to hex color for Plotly
+        hex_color = mcolors.to_hex(rgba)
+        colors.append(hex_color)
     
     progress_fig = go.Figure()
     
     progress_fig.add_trace(go.Bar(
-        y=pillars,
+        y=pillar_labels,
         x=scores,
         orientation='h',
         marker=dict(color=colors),
-        text=[f"{s:.0f}%" for s in scores],
-        textposition='outside',
         hoverinfo='none',
         hovertemplate=None
     ))
@@ -56,9 +58,12 @@ def generate_pillar_chart(df: pd.DataFrame) -> go.Figure:
     progress_fig.update_layout(
         xaxis=dict(
             title="Achievement (%)",
-            range=[0, 100],
+            range=[0, 105],  # Extended slightly beyond 100 to show the 100% gridline
             showgrid=True,
-            gridcolor='lightgray'
+            gridcolor='lightgray',
+            tickmode='array',
+            tickvals=[0, 25, 50, 75, 100],
+            ticktext=['-', 'Nascent', 'Emerging', 'Established', 'Mature']
         ),
         yaxis=dict(
             title="",

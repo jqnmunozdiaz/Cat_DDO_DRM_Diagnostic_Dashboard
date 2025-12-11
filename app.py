@@ -266,9 +266,10 @@ def update_results(n_clicks, pasted_data):
     
     for idx, row in df.iterrows():
         if row["Score"] < 1.0:
-            pillar = row["DRM Pillar"]
             thematic = row["Thematic Area"]
-            below_minimum.append(f"{pillar} - {thematic}")
+            # Remove leading numbers from thematic area name
+            clean_thematic = thematic.split('. ', 1)[1] if '. ' in thematic else thematic
+            below_minimum.append(clean_thematic)
     
     # Generate analysis text
     if below_minimum:
@@ -284,18 +285,14 @@ def update_results(n_clicks, pasted_data):
         else:
             analysis_text = html.Div([
                 html.P([
-                    html.Strong("⚠️ Areas Below Minimum Standard:"),
-                    html.Br(),
-                    f"The following {len(below_minimum)} areas do not meet the minimum standard: "
+                    html.Strong(f"⚠️ The following {len(below_minimum)} areas do not meet the minimum standard:"),
                 ], className="text-warning mb-2"),
                 html.Ul([html.Li(area) for area in below_minimum], className="mb-0")
             ], className="alert alert-warning")
     else:
         analysis_text = html.Div([
             html.P([
-                html.Strong("✓ All Areas Meet Minimum Standards"),
-                html.Br(),
-                "Congratulations! All assessed areas meet or exceed the minimum standard."
+                html.Strong("✓ Congratulations! All assessed areas meet or exceed the minimum standard."),
             ], className="text-success mb-0")
         ], className="alert alert-success")
     
