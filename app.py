@@ -7,81 +7,24 @@ import dash
 from dash import dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 import pandas as pd
-from scripts.figure_generator import generate_figure
+from scripts.petal_chart_figure_generator import generate_figure
+from scripts.pillar_chart import generate_pillar_chart
+from utils.data_parser import parse_pasted_data
 import plotly.graph_objects as go
 import base64
 import os
 import re
 
 # Initialize the Dash app
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
+app = dash.Dash(
+    __name__, 
+    external_stylesheets=[
+        dbc.themes.BOOTSTRAP,
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    ], 
+    suppress_callback_exceptions=True
+)
 server = app.server
-
-# Load the template CSV to get structure
-template_df = pd.read_csv("data/DRM_system_assessment_template_filled_example.csv")
-
-# Extract value columns (all columns except DRM Pillar and Thematic Area)
-value_columns = [col for col in template_df.columns if col not in ["DRM Pillar", "Thematic Area"]]
-
-def parse_pasted_data(raw_text: str):
-    """Parse semicolon-separated rows with comma-separated columns.
-    Returns dataframe aligned to template columns or None if invalid.
-    Expected header must include the value column names matching template.
-    """
-    if not raw_text or raw_text.strip() == "":
-        return None, "No data provided"
-    # Split rows by semicolon
-    rows = [r.strip() for r in raw_text.split(";") if r.strip()]
-    if len(rows) < 2:
-        return None, "Not enough rows (need header + at least one data row)"
-    header = rows[0].split(",")
-    # Normalize header spacing
-    header = [h.strip() for h in header]
-    required_first_two = ["DRM Pillar", "Thematic Area"]
-    if header[0:2] != required_first_two:
-        return None, "Header must start with 'DRM Pillar,Thematic Area'"
-    # Map remaining headers to template value columns by approximate match
-    template_map = {}
-    remaining_headers = header[2:]
-    # Build a lowercase simplified map of template value columns
-    simplified_template = {re.sub(r'[^a-z0-9]', '', c.lower()): c for c in value_columns}
-    for h in remaining_headers:
-        key = re.sub(r'[^a-z0-9]', '', h.lower())
-        if key in simplified_template:
-            template_map[h] = simplified_template[key]
-        else:
-            return None, f"Unrecognized header column: {h}"
-    # Ensure all template value columns are present (strict)
-    if set(template_map.values()) != set(value_columns):
-        return None, "Header value columns do not match required template columns"
-    # Parse data rows
-    data_records = []
-    for r in rows[1:]:
-        cols = [c.strip() for c in r.split(",")]
-        if len(cols) != len(header):
-            return None, f"Row has {len(cols)} columns, expected {len(header)}: {r}"
-        record = {
-            "DRM Pillar": cols[0],
-            "Thematic Area": cols[1]
-        }
-        # Map each remaining value
-        for original_header, raw_val in zip(remaining_headers, cols[2:]):
-            target_col = template_map[original_header]
-            v = raw_val.strip()
-            if v == "" or v.lower() in ["na", "nan", "-"]:
-                record[target_col] = ""
-            else:
-                try:
-                    num = float(v)
-                    # Clamp 0-1
-                    num = max(0, min(1, num))
-                    record[target_col] = num
-                except ValueError:
-                    record[target_col] = ""
-        data_records.append(record)
-    # Build dataframe
-    df = pd.DataFrame(data_records)
-    return df, "Parsed successfully"
 
 # App layout
 app.layout = dbc.Container([
@@ -123,7 +66,7 @@ app.layout = dbc.Container([
                 ], className="text-muted"),
                 
                 html.P([
-                    html.Strong("Recognizing this, the World Bank DRM framework provides a structured approach to evaluate a country's policy and institutional setup for DRM. "), "Drawing on practical country experiences and global good practices, this framework was first proposed in 'The Sendai Report' (Ghesquiere et al. 2012) and is aligned with the Sendai Framework for DRR. It is organized around six essential components of DRM encompassing not only legal and institutional DRM frameworks, but also key policy dimensions related to risk information, risk reduction at the sectoral and territorial level, emergency preparedness and response, financial protection and resilient recovery."
+                    html.Strong("Recognizing this, the World Bank DRM framework provides a structured approach to evaluate a country's policy and institutional setup for DRM. "), "Drawing on practical country experiences and global good practices, this framework was first proposed in 'The Sendai Report' (Ghesquiere et al. 2012) and is aligned with the Sendai Framework for Disaster Risk Reduction. It is organized around six essential components of DRM encompassing not only legal and institutional DRM frameworks, but also key policy dimensions related to risk information, risk reduction at the sectoral and territorial level, emergency preparedness and response, financial protection and resilient recovery."
                 ], className="text-muted"),
                 
                 html.Div([
@@ -142,42 +85,42 @@ app.layout = dbc.Container([
                 html.H3("Guidelines for Using the Tool", className="mb-3"),
                                 
                 html.P([
-                    "The tool reviews each DRM pillar through a series of closed questions. The tool is structured as an Excel-based policy matrix where each row corresponds to a DRM pillar."
-                ], className="text-muted"),
-                
-               html.P([
-                    "In this pilot phase, task team can download the Excel version of the tool for offline use. To ensure objectivity and speed, teams are asked to provide a \"Yes\" or \"No\" answer. This answer must be based on official documents that justify the existence of a series of legal, regulatory, institutional and budgetary conditions that are considered fundamental for managing disaster risk."
+                    html.Strong("The tool assesses each DRM pillar using a set of closed questions presented in an Excel-based questionnaire."), 
+                    " Task teams can download the file for offline completion. To ensure objectivity and speed, teams are asked to provide a \"Yes\" or \"No\" answer. This answer must be based on official documents that justify the existence of a series of legal, regulatory, institutional, and budgetary conditions that are considered fundamental for managing disaster risk."
                 ], className="text-muted"),
                 
                 html.P([
-                    "This is a high-level assessment designed to be completed quickly. If information for a question is unavailable, teams are encouraged to consult other Global Practice (GP) colleagues or national counterparts. This is particularly relevant under Pillar 3, where inputs from colleagues in the Water, Transport, Education, Health, and Agriculture GP can greatly help in gathering the relevant knowledge base."
+                    "This is a high-level assessment designed to be completed quickly. If information for a question is unavailable, teams are encouraged to consult other Global Practice (GP) colleagues or national counterparts. This is particularly relevant under Pillar 3, where inputs from colleagues in the Water, Transport, Education, Health, and Agriculture GP can greatly help in gathering information."
                 ], className="text-muted"),
                 
                 html.P([
-                    "Once all questions are completed, copy/paste the content of cell E7 below. The system will automatically generate key metrics and visual outputs."
+                    "Once all questions are completed, copy/paste the content of the Excel below. The system will automatically generate key metrics and visual outputs."
                 ], className="text-muted"),
-                
-                html.P([
-                    html.Strong("Note: "), "Unanswered questions are treated as \"No\"."
-                ], className="text-muted fst-italic"),
                 
             ], className="mb-4"),
             
             # Section 1: Input Form
-            html.Div([               
+            html.Div([
                 # Download template button
                 dbc.Row([
                     dbc.Col([
-                        dbc.Button("Download Diagnostic Questionnaire", id="download-template-button", color="info", outline=True, className="mb-3"),
+                        dbc.Button(
+                            [html.I(className="fas fa-download me-2"), "Download Diagnostic Questionnaire"],
+                            id="download-template-button",
+                            color="primary",
+                            className="mb-3",
+                            n_clicks=0
+                        ),
                         dcc.Download(id="download-template")
                     ], width=12)
                 ]),
                 
+
                 # Paste area to bulk-populate the table
                 html.Div([
-                    html.Label("Please paste the data from cell E7 of your spreadsheet after completing the diagnostic:", className="form-label fw-semibold"),
+                    html.Label("Please paste the data from cell B10 of your spreadsheet after completing the diagnostic:", className="form-label fw-semibold"),
                     dcc.Textarea(id="paste-input", placeholder="",
-                                  style={"width": "100%", "height": "110px", "fontFamily": "monospace"}),
+                                    style={"width": "100%", "height": "110px", "fontFamily": "monospace"}),
                     html.Div([
                         dbc.Button("See Results", id="paste-apply", color="primary", className="mt-2 me-2"),
                         dbc.Button("Show Example", id="example-button", color="info", outline=True, className="mt-2")
@@ -188,24 +131,12 @@ app.layout = dbc.Container([
                     dbc.Collapse(
                         [
                             html.P(
-                                "Enter the text in cell E7 following the required format. You can copy and paste the example to proceed.",
+                                "Enter the text following the required format. You can copy and paste the following example to proceed.",
                                 className="form-text text-muted mb-2"
                             ),
                             dbc.Card(dbc.CardBody([
                                 html.Pre(
-                                    "DRM Pillar,Thematic Area,Legal and institutional set up,Intermediary DRM outputs,Key DRM achievements,Policy enablers;\n"
-                                    "Legal and Institutional DRM Framework,DRM policies and institutions,1,1,1,0.33;\n"
-                                    "Legal and Institutional DRM Framework,Mainstreaming DRM into national and sectoral development plans,1,0,1,0;\n"
-                                    "Risk Identification,Risk identification,1,0.5,1,1;\n"
-                                    "Risk Reduction,Territorial and urban planning,1,1,1,0.5;\n"
-                                    "Risk Reduction,Public investment at the central level,1,1,1,0;\n"
-                                    "Risk Reduction,Sector-specific risk reduction measures,1,0,0,0;\n"
-                                    "Preparedness,Early warning systems,1,1,1,1;\n"
-                                    "Preparedness,Emergency preparedness and response,1,1,0.5,1;\n"
-                                    "Preparedness,Adaptive social protection,0,0,0,0;\n"
-                                    "Financial Protection,Fiscal risk management,0,1,1,1;\n"
-                                    "Financial Protection,DRF strategies and instruments,1,0,0,1;\n"
-                                    "Resilient Reconstruction,Resilient reconstruction,1,0,1,0",
+                                    "Q1,Yes,1;Q2,No,1;Q3,No,0.5;Q4,Yes,0.5;Q5,No,1;Q6,Yes,1;Q7,No,1;Q8,Yes,0.5;Q9,Yes,0.5;Q10,Yes,1;Q11,No,1;Q12,No,0.5;Q13,Yes,0.5;Q14,Yes,1;Q15,No,1;Q16,Yes,1;Q17,Yes,1;Q18,No,0.25;Q19,No,0.25;Q20,Yes,0.25;Q21,Yes,0.25;Q22,No,1;Q23,Yes,1;Q24,No,1;Q25,No,1;Q26,No,0.5;Q27,No,0.5;Q28,Yes,1;Q29,Yes,1;Q30,Yes,1;Q31,Yes,1;Q32,No,0.5;Q33,No,0.5;Q34,Yes,1;Q35,Yes,1;Q36,Yes,1;Q37,Yes,1;Q38,Yes,1;Q39,Yes,1;Q40,Yes,0.5;Q41,Yes,0.5;Q42,Yes,1;Q43,Yes,1;Q44,Yes,1;Q45,Yes,1;Q46,No,1;Q47,Yes,1",
                                     style={"whiteSpace": "pre-wrap", "fontFamily": "monospace", "fontSize": "0.85rem"}
                                 )
                             ]))
@@ -214,8 +145,8 @@ app.layout = dbc.Container([
                         is_open=False,
                         className="mt-2"
                     )
-                ], className="mb-4"),
-            ], id="section-1", className="section-1 p-4 mb-5 border rounded", style={"backgroundColor": "#f8f9fa"}),
+                ], className="mb-4")
+            ], id="section-1"),
 
             # Section 2: Results (hidden initially)
             html.Div([
@@ -243,7 +174,7 @@ app.layout = dbc.Container([
                 # Closing interpretation text
                 html.Div([
                     html.P([
-                        "The diagnostic should be seen as a starting point for structuring a DRM policy dialogue—not as a final evaluation. Shorter petals indicate areas where the policy framework is weak and/or not producing the expected outcomes. Depending on a range of factors (e.g., political momentum, internal resources, country prioritization), this policy area may be prioritized for further support. Ultimately, this tool supports the identification of priority policy actions—whether to inform the preparation of a Cat DDO operation or to guide Technical Assistance—helping countries shift from reactive disaster response toward a proactive, strategic approach to managing disaster and climate-related risks."
+                        "The diagnostic should be seen as a starting point for structuring a DRM policy dialogue—not as a final evaluation. Shorter petals indicate areas where the policy framework is weak and/or not producing the expected outcomes. Depending on a range of factors (e.g., political momentum, internal resources, country prioritization), this policy area may be prioritized for further support. Ultimately, this tool supports policy dialogue—whether to inform the preparation of a Cat DDO operation or to guide Technical Assistance—helping countries shift from reactive disaster response toward a proactive, strategic approach to managing disaster and climate-related risks."
                     ], className="text-muted"),
                     
                     html.P([
@@ -306,21 +237,8 @@ def handle_paste(n_clicks, raw_text):
     df_parsed, status = parse_pasted_data(raw_text or "")
     if df_parsed is None:
         return dash.no_update, html.Div(status, className="alert alert-danger")
-    # Serialize parsed dataframe to the structure expected by generate_table
-    rows_dict = {}
-    for i in range(len(df_parsed)):
-        row_map = {}
-        for col in value_columns:
-            if col in df_parsed.columns:
-                val = df_parsed.iloc[i][col]
-                if val == "" or pd.isna(val):
-                    continue
-                try:
-                    row_map[col] = float(val)
-                except Exception:
-                    continue
-        rows_dict[str(i)] = row_map
-    serialized = {"rows": rows_dict}
+    # Serialize parsed dataframe (pillar, thematic, score)
+    serialized = df_parsed.to_dict('records')
     return serialized, html.Div(status, className="alert alert-success")
 
 # Callback to generate results on paste or See Results button
@@ -337,75 +255,40 @@ def handle_paste(n_clicks, raw_text):
 )
 def update_results(n_clicks, pasted_data):
     """Process pasted data and generate figure"""
-    if not pasted_data or "rows" not in pasted_data:
+    if not pasted_data:
         raise dash.exceptions.PreventUpdate
     
-    # Build dataframe from pasted store / Prepare table data for the input form, empty
-    df = template_df.copy() 
-    for col in value_columns:
-        df[col] = ""
-    
-    for idx_str, colmap in pasted_data["rows"].items():
-        try:
-            row_idx = int(idx_str)
-        except Exception:
-            continue
-        if 0 <= row_idx < len(df):
-            for col_name, value in colmap.items():
-                if col_name in value_columns:
-                    try:
-                        num_value = float(value)
-                        num_value = max(0, min(1, num_value))
-                    except (ValueError, TypeError):
-                        num_value = 0
-                    df.at[row_idx, col_name] = num_value
+    # Build dataframe from pasted data
+    df = pd.DataFrame(pasted_data)
     
     # Analyze results - find areas below minimum standard (1.0)
     below_minimum = []
     
-    # Group by pillar and calculate total scores
-    df_analysis = df.copy()
-    df_analysis["DRM Pillar"] = template_df["DRM Pillar"].ffill()
-    df_analysis["Thematic Area"] = template_df["Thematic Area"]
-    
-    # Clean pillar names
-    df_analysis["DRM Pillar"] = df_analysis["DRM Pillar"].astype(str).str.replace(r'^\d+\.\s*', '', regex=True)
-    df_analysis["Thematic Area"] = df_analysis["Thematic Area"].astype(str).str.replace(r'^\d+\.?\d*\.?\s*', '', regex=True)
-    
-    for idx, row in df_analysis.iterrows():
-        # Calculate sum across value columns for this row
-        row_sum = sum([float(row[col]) if row[col] != "" and row[col] is not None else 0 for col in value_columns])
-        
-        if row_sum < 1.0:
+    for idx, row in df.iterrows():
+        if row["Score"] < 1.0:
             pillar = row["DRM Pillar"]
-            subpillar = row["Thematic Area"]
-            
-            # Determine what to display
-            if subpillar and subpillar not in ["nan", "-", ""]:
-                below_minimum.append(f"{pillar} - {subpillar}")
-            else:
-                below_minimum.append(pillar)
+            thematic = row["Thematic Area"]
+            below_minimum.append(f"{pillar} - {thematic}")
     
     # Generate analysis text
     if below_minimum:
-        unique_areas = list(dict.fromkeys(below_minimum))  # Remove duplicates while preserving order
-        if len(unique_areas) == 1:
+        if len(below_minimum) == 1:
             analysis_text = html.Div([
                 html.P([
                     html.Strong("⚠️ Areas Below Minimum Standard:"),
                     html.Br(),
                     f"The following area does not meet the minimum standard: "
                 ], className="text-warning mb-2"),
-                html.Ul([html.Li(area) for area in unique_areas], className="mb-0")
+                html.Ul([html.Li(area) for area in below_minimum], className="mb-0")
             ], className="alert alert-warning")
         else:
             analysis_text = html.Div([
                 html.P([
                     html.Strong("⚠️ Areas Below Minimum Standard:"),
                     html.Br(),
-                    f"The following {len(unique_areas)} areas do not meet the minimum standard: "
+                    f"The following {len(below_minimum)} areas do not meet the minimum standard: "
                 ], className="text-warning mb-2"),
-                html.Ul([html.Li(area) for area in unique_areas], className="mb-0")
+                html.Ul([html.Li(area) for area in below_minimum], className="mb-0")
             ], className="alert alert-warning")
     else:
         analysis_text = html.Div([
@@ -416,67 +299,8 @@ def update_results(n_clicks, pasted_data):
             ], className="text-success mb-0")
         ], className="alert alert-success")
     
-    # Calculate average achievement per pillar
-    pillar_scores = {}
-    for pillar in df_analysis["DRM Pillar"].unique():
-        if pillar and pillar not in ["nan", "-", ""]:
-            pillar_rows = df_analysis[df_analysis["DRM Pillar"] == pillar]
-            # Calculate average across all value columns for this pillar
-            pillar_values = []
-            for col in value_columns:
-                for val in pillar_rows[col]:
-                    if val != "" and pd.notna(val):
-                        pillar_values.append(float(val))
-            if pillar_values:
-                avg_score = sum(pillar_values) / len(pillar_values)
-                pillar_scores[pillar] = avg_score * 100  # Convert to percentage
-    
-    # Create horizontal progress bars using Plotly
-    pillars = list(pillar_scores.keys())
-    scores = [pillar_scores[p] for p in pillars]
-    
-    # Determine colors based on score (red if <25%, yellow if <75%, blue if >=75%)
-    colors = []
-    for score in scores:
-        if score < 25:
-            colors.append('#dc3545')  # red
-        elif score < 50:
-            colors.append('#fd7e14')  # orange
-        elif score < 75:
-            colors.append('#ffc107')  # yellow
-        else:
-            colors.append('#0d6efd')  # blue
-    
-    progress_fig = go.Figure()
-    
-    progress_fig.add_trace(go.Bar(
-        y=pillars,
-        x=scores,
-        orientation='h',
-        marker=dict(color=colors),
-        text=[f"{s:.0f}%" for s in scores],
-        textposition='outside',
-        hoverinfo='none',
-        hovertemplate=None
-    ))
-    
-    progress_fig.update_layout(
-        xaxis=dict(
-            title="Achievement (%)",
-            range=[0, 100],
-            showgrid=True,
-            gridcolor='lightgray'
-        ),
-        yaxis=dict(
-            title="",
-            autorange="reversed"
-        ),
-        height=max(300, len(pillars) * 60),
-        margin=dict(l=20, r=80, t=20, b=60),
-        plot_bgcolor='white',
-        paper_bgcolor='white',
-        font=dict(size=12)
-    )
+    # Generate pillar progress chart
+    progress_fig = generate_pillar_chart(df)
     
     # Generate circular figure
     try:

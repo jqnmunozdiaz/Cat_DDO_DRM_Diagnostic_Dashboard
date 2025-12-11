@@ -7,9 +7,7 @@ import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend for web applications
 
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap
 import base64
 from io import BytesIO
 
@@ -24,50 +22,18 @@ def generate_figure(df_input):
         Base64 encoded PNG image string
     """
     
-    # Process data similar to Example_Summary_Figure_clean.py
-    df_raw = df_input.copy()
+    # Process dataframe - input has "DRM Pillar", "Thematic Area", "Score" (normalized 0-1)
+    df = df_input.copy()
     
-    # Remove completely empty rows
-    df_raw = df_raw[df_raw["DRM Pillar"].notna() | df_raw["Thematic Area"].notna()].copy()
+    # Scale normalized scores (0-1) to chart scale (0-4)
+    df["Score"] = df["Score"] * 4.0
     
-    # Create labels
-    df_raw["individual"] = df_raw.apply(
-        lambda row: row["Thematic Area"].strip() 
-        if pd.notna(row["Thematic Area"]) and row["Thematic Area"].strip() != "-" 
-        else row["DRM Pillar"] if pd.notna(row["DRM Pillar"]) else "", 
-        axis=1
-    )
-    
-    # Forward fill DRM Pillar to create groups
-    df_raw["group"] = df_raw["DRM Pillar"].ffill()
-    
-    # Remove rows without labels
-    df_raw = df_raw[df_raw["individual"] != ""].copy()
-    
-    # Get value columns (everything except DRM Pillar and Thematic Area)
-    value_cols = [col for col in df_raw.columns if col not in ["DRM Pillar", "Thematic Area", "individual", "group"]]
-    
-    # Convert values to numeric and sum them
-    for col in value_cols:
-        df_raw[col] = pd.to_numeric(
-            df_raw[col].astype(str).str.strip().replace("-", "0"), 
-            errors='coerce',
-            downcast='float'
-        )
-    
-    # Calculate total value for each row
-    df_raw["total_value"] = df_raw[value_cols].sum(axis=1)
-    
-    # Keep only needed columns
-    df = df_raw[["individual", "group", "total_value"]].copy()
-    df = df.sort_values(["group", "individual"]).reset_index(drop=True)
-    
-    # Remove leading numbers from names
-    df["individual"] = df["individual"].str.replace(r'\d+', '', regex=True)
-    df["individual"] = df["individual"].str.replace('.', '', regex=False)
-    df["individual"] = df["individual"].str.strip()
-    df["group"] = df["group"].str.replace(r'^\d+\.\s*', '', regex=True)
-    df["individual"] = df["individual"].fillna("")
+    # Remove leading numbers from names for display
+    df["Thematic Area"] = df["Thematic Area"].str.replace(r'\d+', '', regex=True)
+    df["Thematic Area"] = df["Thematic Area"].str.replace('.', '', regex=False)
+    df["Thematic Area"] = df["Thematic Area"].str.strip()
+    df["DRM Pillar"] = df["DRM Pillar"].str.replace(r'^\d+\.\s*', '', regex=True)
+    df["Thematic Area"] = df["Thematic Area"].fillna("")
     
     # Calculate positions
     number_of_bars = len(df)
@@ -81,8 +47,8 @@ def generate_figure(df_input):
     angles = []
     current_angle = 0.0
     
-    for g in df["group"].unique():
-        count = (df["group"] == g).sum()
+    for g in df["DRM Pillar"].unique():
+        count = (df["DRM Pillar"] == g).sum()
         for _ in range(count):
             angles.append(current_angle)
             current_angle += bar_width
@@ -98,7 +64,7 @@ def generate_figure(df_input):
     ax.set_theta_zero_location('N')
     
     # Get heights for bars
-    heights = df["total_value"].values
+    heights = df["Score"].values
     
     # Use viridis colormap
     cmap_gradient = plt.get_cmap('viridis')
@@ -109,7 +75,7 @@ def generate_figure(df_input):
     for i, (angle, height) in enumerate(zip(angles, heights)):
         if height > 0:
             # Create stacked segments to simulate gradient
-            n_segments = 50
+            n_segments = 200
             segment_height = height / n_segments
             
             for j in range(n_segments):
@@ -134,7 +100,7 @@ def generate_figure(df_input):
     
     # Configure radial axis
     radial_ticks = [0, 1, 2, 3, 4]
-    max_value = df["total_value"].max()
+    max_value = df["Score"].max()
     ax.set_ylim(-0.5, max(max_value * 1.2, 4))
     ax.set_yticks(radial_ticks)
     ax.set_yticklabels([str('') for r in radial_ticks], fontsize=10, color="grey")
@@ -147,8 +113,8 @@ def generate_figure(df_input):
     
     group_positions = {}
     idx = 0
-    for g in df["group"].unique():
-        count = (df["group"] == g).sum()
+    for g in df["DRM Pillar"].unique():
+        count = (df["DRM Pillar"] == g).sum()
         start = idx
         end = idx + count - 1
         group_positions[g] = (start, end)
@@ -186,12 +152,12 @@ def generate_figure(df_input):
          'Resilient reconstruction': 'Resilient\nreconstruction'}
     
     for old, new in d.items():
-        df["individual"] = df["individual"].astype(str).str.replace(old, new, regex=False)
+        df["Thematic Area"] = df["Thematic Area"].astype(str).str.replace(old, new, regex=False)
     
     for i, row in df.iterrows():
         angle = angles[i] + width / 2
-        total_y = row["total_value"]
-        name = row["individual"]
+        total_y = row["Score"]
+        name = row["Thematic Area"]
         c = "black"
         if total_y < 1:
             c = "red"
@@ -218,6 +184,8 @@ def generate_figure(df_input):
                 alpha=0.7, 
                 fontweight="bold",
                 color=c,
+                bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor='none', alpha=1),
+                zorder=9
             )
     
     ax.set_frame_on(False)

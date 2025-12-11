@@ -1,6 +1,6 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #4b86a2 100%);
+    background: linear-gradient(135deg, #009FDA 0%, #0071BC 100%);
     min-height: 100vh;
     padding: 20px 0;
 }
@@ -14,53 +14,19 @@ body {
 }
 
 h1 {
-    color: #667eea;
+    color: #0071BC;
     font-weight: 700;
 }
 
 h3 {
-    color: #764ba2;
+    color: #009FDA;
     font-weight: 600;
     margin-top: 30px;
 }
 
-.section-1, .section-2 {
+.section-2 {
     background-color: #f8f9fa;
     border-color: #dee2e6 !important;
-}
-
-.table {
-    margin-bottom: 0;
-}
-
-.table th {
-    background-color: #667eea;
-    color: white;
-    font-weight: 600;
-    border: none;
-    text-align: center;
-}
-
-.table td {
-    vertical-align: middle;
-    border-color: #dee2e6;
-}
-
-.pillar-cell, .subpillar-cell {
-    font-weight: 500;
-    background-color: #f0f0f0;
-    color: #333;
-}
-
-.form-control-sm {
-    border: 1px solid #ccc;
-    padding: 6px 8px;
-    font-size: 0.9rem;
-}
-
-.form-control-sm:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
 }
 
 .btn {
@@ -70,15 +36,15 @@ h3 {
 }
 
 .btn-primary {
-    background-color: #667eea;
-    border-color: #667eea;
+    background-color: #0071BC;
+    border-color: #0071BC;
 }
 
 .btn-primary:hover {
-    background-color: #5568d3;
-    border-color: #5568d3;
+    background-color: #005A95;
+    border-color: #005A95;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 113, 188, 0.4);
 }
 
 .btn-success {
@@ -99,36 +65,4 @@ h3 {
 .lead {
     font-size: 1.1rem;
     font-weight: 500;
-}
-
-.table-responsive {
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-/* Remove number input spinners/arrows */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type="number"] {
-    -moz-appearance: textfield;
-}
-
-/* Style text inputs to look consistent */
-.form-control-sm::placeholder {
-    color: #999;
-    font-size: 0.85rem;
-}
-
-/* Highlight invalid inputs */
-.form-control-sm.invalid {
-    border-color: #dc3545 !important;
-    background-color: #fff5f5;
-}
-
-.form-control-sm.invalid:focus {
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
 }
