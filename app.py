@@ -14,7 +14,6 @@ from config.question_config import THEMATIC_AREA_QUESTIONS, parse_question_range
 import plotly.graph_objects as go
 import base64
 import os
-import re
 import json
 from pathlib import Path
 

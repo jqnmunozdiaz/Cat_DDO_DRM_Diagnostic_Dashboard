@@ -132,6 +132,10 @@ Thumbs.db
 # Application specific - generated files only
 DRM_Assessment_Chart.png
 
+# Old/archived files
+data/_old/
+*/_old/
+
 # But keep assets (logos, etc.)
 !assets/**/*.png
 !assets/**/*.jpg
