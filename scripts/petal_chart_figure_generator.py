@@ -98,7 +98,7 @@ def generate_figure(df_input):
         ))
     
     # Add bars - batch segments by color level for efficiency
-    n_segments = 20  # Reduced for performance, overlap fixes appearance
+    n_segments = 50  # Reduced for performance, overlap fixes appearance
     overlap = 0.02  # Small overlap to eliminate white gaps
     
     # Group all segments by their color level (across all bars)
@@ -169,6 +169,17 @@ def generate_figure(df_input):
             showlegend=True
         ))
     
+    # Calculate scale factor dynamically based on radial axis range and layout
+    # With margins of 40px on 800px height, plot domain is from 0.05 to 0.95 in paper coords
+    # That's 0.9 total, so radius from center to edge is 0.45 in paper coordinates
+    max_radius = 5  # Must match the radialaxis range max value
+    height = 800
+    margin = 40
+    # Plot domain fraction = (height - 2*margin) / height = (800-80)/800 = 0.9
+    # Half of that (radius in paper coords) = 0.45
+    plot_radius_fraction = (height - 2 * margin) / height / 2  # = 0.45
+    scale_factor = plot_radius_fraction / max_radius  # = 0.09
+    
     # Add pillar group labels
     title_texts = [
         'Legal and<br>Institutional<br>DRM Framework', 
@@ -182,11 +193,10 @@ def generate_figure(df_input):
     for i, (pillar, (start_idx, end_idx, theta_start, theta_end)) in enumerate(group_positions.items()):
         mid_angle = (theta_start + theta_end) / 2
         # Position labels outside the chart
-        label_radius = 5.3
-        
-        x_pos = 0.5 + 0.48 * np.cos(np.radians(90 - mid_angle))
-        y_pos = 0.5 + 0.48 * np.sin(np.radians(90 - mid_angle))
-        
+        label_radius = 5.9
+        x_pos = 0.5 + (label_radius * scale_factor) * np.cos(np.radians(90 - mid_angle))
+        y_pos = 0.5 + (label_radius * scale_factor) * np.sin(np.radians(90 - mid_angle))
+
         # Manual adjustment for "Legal and Institutional" (index 0)
         if i == 0:
             x_pos += 0.03
@@ -227,38 +237,44 @@ def generate_figure(df_input):
         display_name = label_mapping.get(name, name.replace(' ', '<br>'))
         
         # Color red if below minimum standard
-        text_color = '#c0392b' if score < 1 else '#333'
+        text_color = 'red' if score < 1 else '#333'
         
-        # Position label at end of bar (minimum at 2 for readability)
-        label_radius = max(score + 0.3, 2.3)
+        # Position label just outside the bar (minimum radius of 2 for visibility)
+        # Add offset to place label center outside the bar
+        label_radius = max(2, score) + 0.5
         
-        # Calculate rotation like matplotlib: rotation = -angle (in degrees)
-        # Plotly uses clockwise from top, matplotlib uses counterclockwise from right
-        rotation = -angle  # Angle is already in degrees
+        # Calculate marker size based on text dimensions (approximation)
+        lines = display_name.split('<br>')
+        max_line_chars = max(len(line) for line in lines)
+        # Use max of width and height estimates for circular marker
+        marker_size = max_line_chars * 3
         
-        # Flip text for bottom half of chart (like matplotlib)
-        if -270 < rotation < -90:
-            rotation += 180
-            label_radius += 0.1
+        # Add white square marker as background (uses polar coordinates - will align!)
+        fig.add_trace(go.Scatterpolar(
+            r=[label_radius],
+            theta=[angle],
+            mode='markers',
+            marker=dict(
+                size=marker_size,
+                symbol='circle',
+                color='rgba(255, 255, 255, 0.9)',
+                line=dict(width=0)
+            ),
+            showlegend=False,
+            hoverinfo='skip'
+        ))
         
-        # Convert polar to cartesian for annotation
-        angle_rad = np.radians(90 - angle)  # Convert to standard coordinates
-        x_pos = 0.5 + (label_radius / 6.5) * np.cos(angle_rad)
-        y_pos = 0.5 + (label_radius / 6.5) * np.sin(angle_rad)
-        
-        fig.add_annotation(
-            x=x_pos,
-            y=y_pos,
-            text=display_name,
-            showarrow=False,
-            font=dict(size=8, color=text_color, family='Arial'),
-            align='center',
-            xref='paper',
-            yref='paper',
-            textangle=-rotation,  # Plotly uses opposite sign convention
-            bgcolor='rgba(255,255,255,0.85)',
-            borderpad=2
-        )
+        # Add text on top (same polar coordinates - guaranteed alignment)
+        fig.add_trace(go.Scatterpolar(
+            r=[label_radius],
+            theta=[angle],
+            mode='text',
+            text=[display_name],
+            textposition='middle center',
+            textfont=dict(size=8, color=text_color, family='Arial'),
+            showlegend=False,
+            hoverinfo='skip'
+        ))
     
     # Add a white filled circle at the center to create a "donut" look
     center_hole_radius = 0.35
@@ -290,6 +306,7 @@ def generate_figure(df_input):
             ),
             bgcolor='white'
         ),
+
         showlegend=True,
         legend=dict(
             x=1.0,
@@ -300,6 +317,7 @@ def generate_figure(df_input):
             font=dict(size=10)
         ),
         paper_bgcolor='white',
+        plot_bgcolor='white',  # Set plot area background to white
         autosize=True,  # Responsive width
         height=800,  # Increased height
         margin=dict(l=40, r=40, t=40, b=40),
@@ -307,14 +325,3 @@ def generate_figure(df_input):
     )
     
     return fig
-
-
-def generate_figure_base64(df_input):
-    """
-    Legacy function: Generate base64 PNG from Plotly figure
-    Used for download functionality
-    """
-    fig = generate_figure(df_input)
-    img_bytes = fig.to_image(format="png", width=800, height=800, scale=2)
-    import base64
-    return base64.b64encode(img_bytes).decode()

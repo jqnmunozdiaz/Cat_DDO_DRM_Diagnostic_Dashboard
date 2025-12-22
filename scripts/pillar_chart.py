@@ -36,6 +36,7 @@ def generate_pillar_chart(df: pd.DataFrame) -> go.Figure:
     # Use viridis colormap for continuous colors based on score (0-100)
     cmap = plt.get_cmap('viridis')
     colors = []
+    text_colors = []
     for score in scores:
         # Normalize score (0-100) to colormap range (0-1)
         color_position = score / 100
@@ -43,11 +44,19 @@ def generate_pillar_chart(df: pd.DataFrame) -> go.Figure:
         # Convert matplotlib RGBA to hex color for Plotly
         hex_color = mcolors.to_hex(rgba)
         colors.append(hex_color)
+        # Red text if below 25%
+        text_colors.append('red' if score < 25 else 'black')
+    
+    # Apply text colors to pillar labels
+    colored_labels = [
+        f'<span style="color:{tc}">{label}</span>' 
+        for label, tc in zip(pillar_labels, text_colors)
+    ]
     
     progress_fig = go.Figure()
     
     progress_fig.add_trace(go.Bar(
-        y=pillar_labels,
+        y=colored_labels,
         x=scores,
         orientation='h',
         marker=dict(color=colors),

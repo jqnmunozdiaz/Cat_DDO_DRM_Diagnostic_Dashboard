@@ -6,7 +6,7 @@ from dash import dcc, Input, Output, State
 import plotly.graph_objects as go
 
 
-def _create_image_download(fig_data, filename, width=1000, height=1000, scale=2):
+def _create_image_download(fig_data, filename, width=800, height=800, scale=2):
     """
     Shared helper to convert a Plotly figure to a PNG download dict.
     Returns None if fig_data is invalid.
@@ -16,6 +16,12 @@ def _create_image_download(fig_data, filename, width=1000, height=1000, scale=2)
     
     try:
         fig = go.Figure(fig_data)
+        
+        # Apply tighter margins for download (more zoomed-in appearance)
+        fig.update_layout(
+            margin=dict(l=20, r=20, t=20, b=20),
+        )
+        
         img_bytes = fig.to_image(format="png", width=width, height=height, scale=scale)
         return {
             "content": base64.b64encode(img_bytes).decode(),
