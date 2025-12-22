@@ -49,7 +49,7 @@ def get_input_section():
         html.Div([
             html.H3("Introduction", className="mb-3"),
             html.P([
-                html.Strong("Aaaaa sound Disaster Risk Management (DRM) policy assessment requires a system-wide perspective. "), 
+                html.Strong("A sound Disaster Risk Management (DRM) policy assessment requires a system-wide perspective. "), 
                 "Unlike traditional sectors, DRM cuts across infrastructure sectors, such as energy, water, transport, urban development, as well as socioenvironmental sectors, such as education, health, social protection and environmental management. Disaster risk also affects economic growth, fiscal stability and jobs. In short, disaster risk is a development challenge arising from the interaction of hazard, exposure, and vulnerability. While managing the immediate impacts of disasters is vital, building disaster resilience therefor requires a more comprehensive, multisectoral policy approach."
             ], className="text-muted"),
             html.P([
