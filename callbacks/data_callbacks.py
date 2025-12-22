@@ -131,24 +131,17 @@ def register_data_callbacks(app):
             petal_fig = generate_figure(df)
             
             figure_html = html.Div([
-                html.Div([
-                    html.H5("Results by Thematic Area", className="mb-3 mt-0"),
-                    dbc.Button(
-                        "Download Figure",
-                        id="download-button",
-                        color="success",
-                        outline=True,
-                        size="sm",
-                        className="mt-0"
-                    )
-                ], style={"display": "flex", "alignItems": "flex-start", "justifyContent": "space-between"}, className="mb-3"),
+                html.H5("Results by Thematic Area", className="mb-3 mt-0"),
                 dcc.Graph(
                     id="petal-chart",
                     figure=petal_fig,
-                    config={'displayModeBar': False},
+                    config={
+                        'displayModeBar': True,
+                        'modeBarButtonsToRemove': ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
+                        'toImageButtonOptions': {'format': 'png', 'filename': 'DRM_Assessment_Result', 'scale': 2}
+                    },
                     style={"maxWidth": "100%", "height": "auto", "borderRadius": "8px", "boxShadow": "0 2px 8px rgba(0,0,0,0.1)"}
-                ),
-                dcc.Download(id="download-image")
+                )
             ])
             
             # Store the figure dict for download
