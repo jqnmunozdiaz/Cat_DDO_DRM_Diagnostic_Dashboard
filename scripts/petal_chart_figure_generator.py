@@ -1,230 +1,279 @@
 """
-Figure Generator for DRM System Assessment
-Converts input dataframe to PNG figure (base64 encoded)
+Figure Generator for DRM System Assessment - Plotly Version
+Generates interactive polar bar chart using Plotly for fast client-side rendering
 """
 
-import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend for web applications
-
 import numpy as np
-import matplotlib.pyplot as plt
-import base64
-from io import BytesIO
+import plotly.graph_objects as go
+import plotly.colors as pc
+
+# Viridis colorscale values for manual color mapping
+VIRIDIS_COLORS = [
+    (0.0, '#440154'), (0.25, '#3b528b'), (0.5, '#21918c'), 
+    (0.75, '#5ec962'), (1.0, '#fde725')
+]
+
+def get_viridis_color(value):
+    """Get viridis color for a value between 0-1"""
+    colors = pc.sample_colorscale('Viridis', [value])[0]
+    return colors
 
 def generate_figure(df_input):
     """
-    Generate DRM Assessment circular bar chart from input dataframe
+    Generate DRM Assessment circular bar chart using Plotly barpolar
     
     Args:
-        df_input: DataFrame with DRM data (same structure as template)
+        df_input: DataFrame with DRM data columns: "DRM Pillar", "Thematic Area", "Score" (0-1)
         
     Returns:
-        Base64 encoded PNG image string
+        Plotly Figure object
     """
     
-    # Process dataframe - input has "DRM Pillar", "Thematic Area", "Score" (normalized 0-1)
     df = df_input.copy()
     
     # Scale normalized scores (0-1) to chart scale (0-4)
-    max_scale = 4  # Maximum value on the scale
+    max_scale = 4
     df["Score"] = df["Score"] * max_scale
     
-    # Remove leading numbers from names for display
-    df["Thematic Area"] = df["Thematic Area"].str.replace(r'\d+', '', regex=True)
-    df["Thematic Area"] = df["Thematic Area"].str.replace('.', '', regex=False)
-    df["Thematic Area"] = df["Thematic Area"].str.strip()
-    df["DRM Pillar"] = df["DRM Pillar"].str.replace(r'^\d+\.\s*', '', regex=True)
-    df["Thematic Area"] = df["Thematic Area"].fillna("")
+    # Clean thematic area names for display
+    df["Thematic Area Clean"] = df["Thematic Area"].str.replace(r'^\d+\.\d*\.?\s*', '', regex=True).str.strip()
+    df["DRM Pillar Clean"] = df["DRM Pillar"].str.replace(r'^\d+\.\s*', '', regex=True)
     
-    # Calculate positions
+    # Calculate bar positions with gaps between groups
     number_of_bars = len(df)
     number_of_groups = 6
     gap_width_ratio = 0.5
     
-    bar_width = 2 * np.pi / (number_of_bars + number_of_groups * gap_width_ratio)
-    gap_width = gap_width_ratio * bar_width
+    bar_width_deg = 360 / (number_of_bars + number_of_groups * gap_width_ratio)
+    gap_width_deg = gap_width_ratio * bar_width_deg
     
-    # Create angles array with gaps between groups
+    # Build angles with gaps between groups
     angles = []
     current_angle = 0.0
+    group_positions = {}  # Store start/end for each group
     
     for g in df["DRM Pillar"].unique():
         count = (df["DRM Pillar"] == g).sum()
+        start_idx = len(angles)
         for _ in range(count):
             angles.append(current_angle)
-            current_angle += bar_width
-        current_angle += gap_width
+            current_angle += bar_width_deg
+        end_idx = len(angles) - 1
+        group_positions[g] = (start_idx, end_idx, angles[start_idx], angles[end_idx] + bar_width_deg)
+        current_angle += gap_width_deg
     
-    angles = np.array(angles)
-    width = bar_width
+    df["angle"] = angles
     
-    # Create circular bar chart
-    fig, ax = plt.subplots(figsize=(10, 10), subplot_kw=dict(polar=True))
+    # Create figure
+    fig = go.Figure()
     
-    ax.set_theta_direction(-1)
-    ax.set_theta_zero_location('N')
+    # Add bars - batch segments by color level for efficiency
+    n_segments = 20  # Reduced for performance, overlap fixes appearance
+    overlap = 0.02  # Small overlap to eliminate white gaps
     
-    # Get heights for bars
-    heights = df["Score"].values
-    
-    # Use viridis colormap
-    cmap_gradient = plt.get_cmap('viridis')
-    
-    # Plot bars with vertical gradient based on absolute height (0-4 scale)
-    
-    for i, (angle, height) in enumerate(zip(angles, heights)):
-        # Draw full background bar (transparent with white border)
-        ax.bar(
-            angle, height,
-            width=width,
-            bottom=0,
-            align="edge",
-            facecolor='none',
-            edgecolor='white',
-            linewidth=0.5,
-            zorder=11,
-        )
+    # Group all segments by their color level (across all bars)
+    for j in range(n_segments):
+        r_values = []
+        theta_values = []
+        width_values = []
+        base_values = []
+        colors = []
+        line_colors = []
         
-        if height > 0:
-            # Create stacked segments to simulate gradient
-            n_segments = 80
-            segment_height = height / n_segments
+        for idx, row in df.iterrows():
+            angle = row["angle"]
+            height = row["Score"]
             
-            for j in range(n_segments):
-                # Color based on absolute height value (0 to 4)
-                # Use center of segment for more accurate color
-                absolute_position = ((j + 0.5) / n_segments) * height
-                color_position = absolute_position / max_scale  # Normalize to 0-1 based on max scale
-                color_position = min(color_position, 1.0)  # Cap at 1.0
-                color = cmap_gradient(color_position)
+            if height > 0:
+                segment_height = height / n_segments
+                bottom = j * segment_height
                 
-                ax.bar(
-                    angle, segment_height, 
-                    width=width, 
-                    bottom=j * segment_height, 
-                    align="edge",
-                    color=color, 
-                    edgecolor=color, 
-                    linewidth=0.5,
-                    alpha=1.0,
-                    zorder=10,
-                )
-    
-    # Configure radial axis
-    radial_ticks = [0, 1, 2, 3, 4]
-    max_value = df["Score"].max()
-    ax.set_ylim(-0.5, max(max_value * 1.2, 4))
-    ax.set_yticks(radial_ticks)
-    ax.set_yticklabels([str('') for r in radial_ticks], fontsize=10, color="grey")
-    ax.yaxis.grid(True, color="grey", linestyle=(0, (4, 6)), linewidth=1, zorder=0, alpha=0.2)
-    ax.set_xticks([])
-    
-    # Add group labels
-    title_texts = ['Legal and\nInstitutional\nDRM Framework', 'Risk\nIdentification', 'Risk\nReduction',
-                   'Preparedness', 'Financial\nProtection', 'Resilient\nReconstruction']
-    
-    group_positions = {}
-    idx = 0
-    for g in df["DRM Pillar"].unique():
-        count = (df["DRM Pillar"] == g).sum()
-        start = idx
-        end = idx + count - 1
-        group_positions[g] = (start, end)
-        idx += count
-    
-    i = 0
-    for g, (start, end) in group_positions.items():
-        theta_start = angles[start] if start < len(angles) else angles[-1]
-        theta_end = angles[end] + width if end < len(angles) else angles[-1] + width
+                # Only add segment if it's within the bar's height
+                if bottom < height:
+                    # Add small overlap to prevent white gaps
+                    actual_segment = min(segment_height + overlap, height - bottom + overlap)
+                    absolute_position = ((j + 0.5) / n_segments) * height
+                    color_position = min(absolute_position / max_scale, 1.0)
+                    color = get_viridis_color(color_position)
+                    
+                    r_values.append(actual_segment)
+                    theta_values.append(angle + bar_width_deg / 2)
+                    width_values.append(bar_width_deg * 0.95)
+                    base_values.append(bottom)
+                    colors.append(color)
+                    line_colors.append(color)
         
-        max_radius = max(max_value * 1.2, 4)
-        separator_theta = angles[end] + width + gap_width / 2
-        ax.plot([separator_theta, separator_theta], [0, max_radius], 
-                color='gray', linewidth=1, alpha=0.2, zorder=15)
+        if r_values:
+            fig.add_trace(go.Barpolar(
+                r=r_values,
+                theta=theta_values,
+                width=width_values,
+                base=base_values,
+                marker=dict(color=colors, line=dict(width=0.5, color=line_colors)),
+                showlegend=False,
+                hoverinfo='skip'
+            ))
+    
+    # Add gray separator lines between pillar groups
+    max_radius = 4.4
+    for pillar, (start_idx, end_idx, theta_start, theta_end) in group_positions.items():
+        separator_angle = theta_end + gap_width_deg / 2
+        fig.add_trace(go.Scatterpolar(
+            r=[0, max_radius],
+            theta=[separator_angle, separator_angle],
+            mode='lines',
+            line=dict(color='lightgray', width=1, dash='solid'),
+            showlegend=False,
+            hoverinfo='skip',
+            opacity=0.5
+        ))
+    # Add reference circles
+    circle_angles = np.linspace(0, 360, 100, endpoint=False)
+    
+    circle_configs = [
+        (1, '#e74c3c', 'Nascent'),      # Red
+        (2, '#e67e22', 'Emerging'),      # Orange  
+        (3, '#3498db', 'Established'),   # Blue
+        (4, '#27ae60', 'Mature'),        # Green
+    ]
+    
+    for radius, color, name in circle_configs:
+        fig.add_trace(go.Scatterpolar(
+            r=[radius] * len(circle_angles),
+            theta=circle_angles,
+            mode='lines',
+            line=dict(color=color, width=1.5, dash='dash'),
+            name=name,
+            showlegend=True,
+            hoverinfo='skip'
+        ))
+    
+    # Add pillar group labels
+    title_texts = [
+        'Legal and\nInstitutional\nDRM Framework', 
+        'Risk\nIdentification', 
+        'Risk\nReduction',
+        'Preparedness', 
+        'Financial\nProtection', 
+        'Resilient\nReconstruction'
+    ]
+    
+    for i, (pillar, (start_idx, end_idx, theta_start, theta_end)) in enumerate(group_positions.items()):
+        mid_angle = (theta_start + theta_end) / 2
+        # Position labels outside the chart
+        label_radius = 5.3
         
-        # Determine title distance based on max score in this group
-        group_max_score = df[df["DRM Pillar"] == g]["Score"].max()
-        title_distance = 5.2 if group_max_score >= 4 else 4.7
-        
-        ax.text(
-            (theta_start + theta_end) / 2, title_distance, title_texts[i],
-            ha='center', va='center',
-            fontsize=8, fontweight='bold', alpha=0.9
+        fig.add_annotation(
+            x=0.5 + 0.42 * np.cos(np.radians(90 - mid_angle)),
+            y=0.5 + 0.42 * np.sin(np.radians(90 - mid_angle)),
+            text=title_texts[i],
+            showarrow=False,
+            font=dict(size=10, color='#333', family='Arial Black'),
+            align='center',
+            xref='paper',
+            yref='paper'
         )
-        i += 1
     
     # Add individual bar labels
-    d = {'DRM policies and institutions': 'DRM policies\nand\ninstitutions',
-         'Mainstreaming DRM into national and sectoral development plans': 'Mainstreaming\nDRM into\nnational and\nsectoral\ndevelopment\nplans',
-         'Risk identification': 'Risk\nidentification',
-         'Territorial and urban planning': 'Territorial\nand\nurban\nplanning',
-         'Public investment at the central level': 'Public\ninvestment at\nthe central\nlevel',
-         'Sector-specific risk reduction measures': 'Sector-specific\nrisk\nreduction\nmeasures',
-         'Early warning systems': 'Early\nwarning\nsystems',
-         'Emergency preparedness and response': 'Emergency\npreparedness\n& response',
-         'Adaptive social protection': 'Adaptive\nsocial\nprotection',
-         'Fiscal risk management': 'Fiscal risk\nmanagement',
-         'DRF strategies and instruments': 'DRF strategies\nand\ninstruments',
-         'Resilient reconstruction': 'Resilient\nreconstruction'}
+    label_mapping = {
+        'DRM policies and institutions': 'DRM policies<br>and institutions',
+        'Mainstreaming DRM into national and sectoral development plans': 'Mainstreaming DRM<br>into national and<br>sectoral plans',
+        'Risk identification': 'Risk<br>identification',
+        'Territorial and urban planning': 'Territorial and<br>urban planning',
+        'Public investment at the central level': 'Public investment<br>at central level',
+        'Sector-specific risk reduction measures': 'Sector-specific<br>risk reduction',
+        'Early warning systems': 'Early warning<br>systems',
+        'Emergency preparedness and response': 'Emergency<br>preparedness',
+        'Adaptive social protection': 'Adaptive social<br>protection',
+        'Fiscal risk management': 'Fiscal risk<br>management',
+        'DRF strategies and instruments': 'DRF strategies<br>and instruments',
+        'Resilient reconstruction': 'Resilient<br>reconstruction'
+    }
     
-    for old, new in d.items():
-        df["Thematic Area"] = df["Thematic Area"].astype(str).str.replace(old, new, regex=False)
-    
-    for i, row in df.iterrows():
-        angle = angles[i] + width / 2
-        total_y = row["Score"]
-        name = row["Thematic Area"]
-        c = "black"
-        if total_y < 1:
-            c = "red"
+    for idx, row in df.iterrows():
+        angle = row["angle"] + bar_width_deg / 2
+        score = row["Score"]
+        name = row["Thematic Area Clean"]
         
-        if total_y < 2:
-            total_y = 2
+        # Map to shorter label if available
+        display_name = label_mapping.get(name, name.replace(' ', '<br>'))
         
-        if name:
-            rotation = np.degrees(-angle)
-            va = "bottom"
-            
-            if -270 < rotation < -90:
-                rotation += 180
-                total_y += 0.1
-                va = "top"
-            
-            ax.text(
-                angle, total_y, name, 
-                rotation=rotation, 
-                rotation_mode="anchor",
-                ha="center", 
-                va=va,
-                fontsize=7, 
-                alpha=0.7, 
-                fontweight="bold",
-                color=c,
-                bbox=dict(boxstyle='round,pad=0.1', facecolor='white', edgecolor='none', alpha=0.9),
-                zorder=9
-            )
+        # Color red if below minimum standard
+        text_color = '#c0392b' if score < 1 else '#333'
+        
+        # Position label at end of bar (minimum at 2 for readability)
+        label_radius = max(score + 0.3, 2.3)
+        
+        # Calculate rotation like matplotlib: rotation = -angle (in degrees)
+        # Plotly uses clockwise from top, matplotlib uses counterclockwise from right
+        rotation = -angle  # Angle is already in degrees
+        
+        # Flip text for bottom half of chart (like matplotlib)
+        if -270 < rotation < -90:
+            rotation += 180
+            label_radius += 0.1
+        
+        # Convert polar to cartesian for annotation
+        angle_rad = np.radians(90 - angle)  # Convert to standard coordinates
+        x_pos = 0.5 + (label_radius / 6.5) * np.cos(angle_rad)
+        y_pos = 0.5 + (label_radius / 6.5) * np.sin(angle_rad)
+        
+        fig.add_annotation(
+            x=x_pos,
+            y=y_pos,
+            text=display_name,
+            showarrow=False,
+            font=dict(size=8, color=text_color, family='Arial'),
+            align='center',
+            xref='paper',
+            yref='paper',
+            textangle=-rotation,  # Plotly uses opposite sign convention
+            bgcolor='rgba(255,255,255,0.85)',
+            borderpad=2
+        )
     
-    ax.set_frame_on(False)
+    # Configure layout
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 5],
+                showticklabels=False,
+                showline=False,
+                showgrid=False  # Remove all radial grid lines
+            ),
+            angularaxis=dict(
+                visible=False,
+                direction='clockwise',
+                rotation=90
+            ),
+            bgcolor='white'
+        ),
+        showlegend=True,
+        legend=dict(
+            x=1.0,
+            y=1.0,
+            bgcolor='rgba(255,255,255,0.9)',
+            bordercolor='#ddd',
+            borderwidth=1,
+            font=dict(size=10)
+        ),
+        paper_bgcolor='white',
+        autosize=True,  # Responsive width
+        height=800,  # Increased height
+        margin=dict(l=40, r=40, t=40, b=40),
+        dragmode=False  # Disable zoom/pan
+    )
     
-    # Add standard circles with labels
-    theta_circle = np.linspace(0, 2 * np.pi, 100)
-    r_circle = np.ones_like(theta_circle)
-    
-    # Circle at 1...
-    ax.plot(theta_circle, r_circle, color='red', linewidth=1, zorder=5, linestyle='--', label="Nascent", alpha=0.5)
-    ax.plot(theta_circle, 2 * r_circle, color='orange', linewidth=1, zorder=5, linestyle='--', label="Emerging", alpha=0.5)
-    ax.plot(theta_circle, 3 * r_circle, color='blue', linewidth=1, zorder=5, linestyle='--', label="Established", alpha=0.5)
-    ax.plot(theta_circle, 4 * r_circle, color='green', linewidth=1, zorder=5, linestyle='--', label="Mature", alpha=0.5)
-    
-    # Add legend
-    ax.legend(loc="upper right", ncols=1, fontsize=8, frameon=True, borderpad=1.2, labelspacing=0.8)
-    plt.subplots_adjust(top=0.95, bottom=0.15)
-    
-    # Convert to base64
-    buffer = BytesIO()
-    plt.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
-    buffer.seek(0)
-    image_base64 = base64.b64encode(buffer.getvalue()).decode()
-    plt.close(fig)
-    
-    return image_base64
+    return fig
+
+
+def generate_figure_base64(df_input):
+    """
+    Legacy function: Generate base64 PNG from Plotly figure
+    Used for download functionality
+    """
+    fig = generate_figure(df_input)
+    img_bytes = fig.to_image(format="png", width=800, height=800, scale=2)
+    import base64
+    return base64.b64encode(img_bytes).decode()
