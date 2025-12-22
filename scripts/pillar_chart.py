@@ -4,8 +4,7 @@ Generate pillar progress bar chart
 
 import plotly.graph_objects as go
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
+import plotly.colors as pcolors
 
 def generate_pillar_chart(df: pd.DataFrame) -> go.Figure:
     """
@@ -33,17 +32,13 @@ def generate_pillar_chart(df: pd.DataFrame) -> go.Figure:
     # Remove leading numbers from pillar names for display
     pillar_labels = [p.split('. ', 1)[1] if '. ' in p else p for p in pillars]
     
-    # Use viridis colormap for continuous colors based on score (0-100)
-    cmap = plt.get_cmap('viridis')
-    colors = []
+    # Use plotly.colors to sample from Viridis colorscale
+    # Normalize scores (0-100) to (0-1)
+    normalized_scores = [s / 100.0 for s in scores]
+    colors = pcolors.sample_colorscale(pcolors.sequential.Viridis, normalized_scores)
+    
     text_colors = []
     for score in scores:
-        # Normalize score (0-100) to colormap range (0-1)
-        color_position = score / 100
-        rgba = cmap(color_position)
-        # Convert matplotlib RGBA to hex color for Plotly
-        hex_color = mcolors.to_hex(rgba)
-        colors.append(hex_color)
         # Red text if below 25%
         text_colors.append('red' if score < 25 else 'black')
     
