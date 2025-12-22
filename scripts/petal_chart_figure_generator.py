@@ -18,6 +18,7 @@ def get_viridis_color(value):
     colors = pc.sample_colorscale('Viridis', [value])[0]
     return colors
 
+
 def generate_figure(df_input):
     """
     Generate DRM Assessment circular bar chart using Plotly barpolar
@@ -66,6 +67,35 @@ def generate_figure(df_input):
     
     # Create figure
     fig = go.Figure()
+    
+    # Reference circle configs
+    circle_configs = [
+        (1, '#e74c3c', 'Nascent'),      # Red
+        (2, '#e67e22', 'Emerging'),      # Orange  
+        (3, '#3498db', 'Established'),   # Blue
+        (4, '#27ae60', 'Mature'),        # Green
+    ]
+    
+    # Add reference circles as thin Barpolar rings FIRST (so they render behind data bars)
+    # Using Barpolar ensures same rendering layer as data bars
+    circle_angles_deg = np.linspace(0, 360, 72, endpoint=False)  # 72 segments for smooth circle
+    ring_width = 0.02  # Very thin ring
+    
+    for radius, color, name in circle_configs:
+        fig.add_trace(go.Barpolar(
+            r=[ring_width] * len(circle_angles_deg),
+            theta=circle_angles_deg,
+            width=[5] * len(circle_angles_deg),
+            base=[radius - ring_width/2] * len(circle_angles_deg),
+            marker=dict(
+                color=color,
+                line=dict(width=0.5, color=color)
+            ),
+            opacity=0.4,
+            name=name,
+            showlegend=False,
+            hoverinfo='skip'
+        ))
     
     # Add bars - batch segments by color level for efficiency
     n_segments = 20  # Reduced for performance, overlap fixes appearance
@@ -127,35 +157,26 @@ def generate_figure(df_input):
             hoverinfo='skip',
             opacity=0.5
         ))
-    # Add reference circles
-    circle_angles = np.linspace(0, 360, 100, endpoint=False)
     
-    circle_configs = [
-        (1, '#e74c3c', 'Nascent'),      # Red
-        (2, '#e67e22', 'Emerging'),      # Orange  
-        (3, '#3498db', 'Established'),   # Blue
-        (4, '#27ae60', 'Mature'),        # Green
-    ]
-    
+    # Add invisible traces for legend (shapes don't appear in legend)
     for radius, color, name in circle_configs:
         fig.add_trace(go.Scatterpolar(
-            r=[radius] * len(circle_angles),
-            theta=circle_angles,
+            r=[None],
+            theta=[None],
             mode='lines',
-            line=dict(color=color, width=1.5, dash='dash'),
+            line=dict(color=color, width=1.5, dash='solid'),
             name=name,
-            showlegend=True,
-            hoverinfo='skip'
+            showlegend=True
         ))
     
     # Add pillar group labels
     title_texts = [
-        'Legal and\nInstitutional\nDRM Framework', 
-        'Risk\nIdentification', 
-        'Risk\nReduction',
+        'Legal and<br>Institutional<br>DRM Framework', 
+        'Risk<br>Identification', 
+        'Risk<br>Reduction',
         'Preparedness', 
-        'Financial\nProtection', 
-        'Resilient\nReconstruction'
+        'Financial<br>Protection', 
+        'Resilient<br>Reconstruction'
     ]
     
     for i, (pillar, (start_idx, end_idx, theta_start, theta_end)) in enumerate(group_positions.items()):
@@ -163,9 +184,16 @@ def generate_figure(df_input):
         # Position labels outside the chart
         label_radius = 5.3
         
+        x_pos = 0.5 + 0.48 * np.cos(np.radians(90 - mid_angle))
+        y_pos = 0.5 + 0.48 * np.sin(np.radians(90 - mid_angle))
+        
+        # Manual adjustment for "Legal and Institutional" (index 0)
+        if i == 0:
+            x_pos += 0.03
+        
         fig.add_annotation(
-            x=0.5 + 0.42 * np.cos(np.radians(90 - mid_angle)),
-            y=0.5 + 0.42 * np.sin(np.radians(90 - mid_angle)),
+            x=x_pos,
+            y=y_pos,
             text=title_texts[i],
             showarrow=False,
             font=dict(size=10, color='#333', family='Arial Black'),
@@ -232,6 +260,19 @@ def generate_figure(df_input):
             borderpad=2
         )
     
+    # Add a white filled circle at the center to create a "donut" look
+    center_hole_radius = 0.35
+    fig.add_trace(go.Scatterpolar(
+        r=[center_hole_radius] * 72,
+        theta=np.linspace(0, 360, 72, endpoint=False),
+        mode='lines',
+        fill='toself',
+        fillcolor='white',
+        line=dict(color='white', width=0),
+        showlegend=False,
+        hoverinfo='skip'
+    ))
+
     # Configure layout
     fig.update_layout(
         polar=dict(
