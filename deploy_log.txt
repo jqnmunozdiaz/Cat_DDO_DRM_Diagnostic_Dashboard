@@ -1,0 +1,170 @@
+DEBUG: Running [gcloud.app.deploy] with arguments: [--quiet: "True", --verbosity: "debug"]
+DEBUG: Loading runtimes experiment config from [gs://runtime-builders/experiments.yaml]
+INFO: Reading [<googlecloudsdk.api_lib.storage.storage_util.ObjectReference object at 0x000001C011114650>]
+DEBUG: Starting new HTTPS connection (1): storage.googleapis.com:443
+DEBUG: https://storage.googleapis.com:443 "GET /storage/v1/b/runtime-builders/o/experiments.yaml?alt=media HTTP/1.1" 206 64
+DEBUG: Flex image build option: FlexImageBuildOptions.ON_SERVER
+WARNING: You might be using automatic scaling for a standard environment deployment, without providing a value for automatic_scaling.max_instances. Starting from March, 2025, App Engine sets the automatic scaling maximum instances default for standard environment deployments to 20. This change doesn't impact existing apps. To override the default, specify the new max_instances value in your app.yaml file, and deploy a new version or redeploy over an existing version. For details on max_instances, see https://cloud.google.com/appengine/docs/standard/reference/app-yaml.md#scaling_elements. 
+
+DEBUG: API endpoint: [https://appengine.googleapis.com/], API version: [v1]
+DEBUG: Starting new HTTPS connection (1): appengine.googleapis.com:443
+DEBUG: https://appengine.googleapis.com:443 "GET /v1/apps/drm-diagnostic-tool?alt=json HTTP/1.1" 200 None
+Services to deploy:
+
+descriptor:                  [C:\Users\jqnmu\OneDrive\World_Bank_DRM\Cat_DDO_DRM_Diagnostic_Dashboard\app.yaml]
+source:                      [C:\Users\jqnmu\OneDrive\World_Bank_DRM\Cat_DDO_DRM_Diagnostic_Dashboard]
+target project:              [drm-diagnostic-tool]
+target service:              [default]
+target version:              [20251222t171906]
+target url:                  [https://drm-diagnostic-tool.uc.r.appspot.com]
+target service account:      [drm-diagnostic-tool@appspot.gserviceaccount.com]
+
+
+DEBUG: No bucket specified, retrieving default bucket.
+DEBUG: Using bucket [gs://staging.drm-diagnostic-tool.appspot.com].
+DEBUG: https://appengine.googleapis.com:443 "GET /v1/apps/drm-diagnostic-tool/services?alt=json&pageSize=100 HTTP/1.1" 200 None
+Beginning deployment of service [default]...
+INFO: Using ignore file at [C:\Users\jqnmu\OneDrive\World_Bank_DRM\Cat_DDO_DRM_Diagnostic_Dashboard\.gcloudignore].
+DEBUG: Skipping file [.gitattributes]
+DEBUG: Skipping file [.gitignore]
+DEBUG: Skipping file [.git]
+DEBUG: Skipping file [.github]
+DEBUG: Skipping file [.vscode]
+DEBUG: Skipping file [LLM]
+DEBUG: Skipping file [_old]
+DEBUG: Skipping file [__pycache__]
+DEBUG: Skipping file [callbacks\__pycache__]
+DEBUG: Skipping file [config\__pycache__]
+DEBUG: Skipping file [data\_old]
+DEBUG: Skipping file [layouts\__pycache__]
+DEBUG: Skipping file [scripts\__pycache__]
+DEBUG: Skipping file [utils\__pycache__]
+DEBUG: Starting new HTTPS connection (1): storage.googleapis.com:443
+DEBUG: https://storage.googleapis.com:443 "GET /storage/v1/b/staging.drm-diagnostic-tool.appspot.com?alt=json&fields=lifecycle HTTP/1.1" 200 172
+DEBUG: https://storage.googleapis.com:443 "GET /storage/v1/b/staging.drm-diagnostic-tool.appspot.com/o?alt=json&maxResults=1000 HTTP/1.1" 200 35124
+DEBUG: Skipping upload of [.gcloudignore]
+INFO: Incremental upload skipped 100.0% of data
+DEBUG: Skipping upload of [app.py]
+INFO: Incremental upload skipped 100.0% of data
+DEBUG: Skipping upload of [app.yaml]
+INFO: Incremental upload skipped 100.0% of data
+DEBUG: Skipping upload of [Cat_DDO_DRM_Diagnostic_Dashboard.code-workspace]
+INFO: Incremental upload skipped 100.0% of data
+INFO: Incremental upload skipped 27.82% of data
+DEBUG: Skipping upload of [Procfile]
+INFO: Incremental upload skipped 28.19% of data
+DEBUG: Skipping upload of [README.md]
+INFO: Incremental upload skipped 67.46% of data
+DEBUG: Skipping upload of [requirements.txt]
+INFO: Incremental upload skipped 68.03% of data
+DEBUG: Skipping upload of [runtime.txt]
+INFO: Incremental upload skipped 68.08% of data
+DEBUG: Skipping upload of [assets/css/app.css]
+INFO: Incremental upload skipped 71.34% of data
+DEBUG: Skipping upload of [assets/images/gfdrr-logo.png]
+INFO: Incremental upload skipped 95.84% of data
+DEBUG: Skipping upload of [assets/images/Policy_Framework.png]
+INFO: Incremental upload skipped 99.12% of data
+DEBUG: Skipping upload of [assets/images/wb-full-logo.png]
+INFO: Incremental upload skipped 99.2% of data
+DEBUG: Skipping upload of [callbacks/data_callbacks.py]
+INFO: Incremental upload skipped 99.21% of data
+DEBUG: Skipping upload of [callbacks/download_callbacks.py]
+INFO: Incremental upload skipped 99.22% of data
+DEBUG: Skipping upload of [callbacks/ui_callbacks.py]
+INFO: Incremental upload skipped 99.22% of data
+DEBUG: Skipping upload of [callbacks/__init__.py]
+INFO: Incremental upload skipped 99.22% of data
+DEBUG: Skipping upload of [config/question_config.py]
+INFO: Incremental upload skipped 99.23% of data
+DEBUG: Skipping upload of [data/DRM System Diagnostic Assessment - Template.xlsx]
+INFO: Incremental upload skipped 99.26% of data
+DEBUG: Skipping upload of [layouts/header.py]
+INFO: Incremental upload skipped 99.26% of data
+DEBUG: Skipping upload of [layouts/input_section.py]
+INFO: Incremental upload skipped 99.28% of data
+DEBUG: Skipping upload of [layouts/main_layout.py]
+INFO: Incremental upload skipped 99.28% of data
+DEBUG: Skipping upload of [layouts/results_section.py]
+INFO: Incremental upload skipped 99.28% of data
+DEBUG: Skipping upload of [layouts/__init__.py]
+INFO: Incremental upload skipped 99.28% of data
+DEBUG: Skipping upload of [scripts/1. LLM - Extract_Questions_from_Excel.py]
+INFO: Incremental upload skipped 99.29% of data
+DEBUG: Skipping upload of [scripts/Example_Summary_Figure_clean.py]
+INFO: Incremental upload skipped 99.3% of data
+DEBUG: Skipping upload of [scripts/petal_chart_figure_generator.py]
+INFO: Incremental upload skipped 99.32% of data
+DEBUG: Skipping upload of [scripts/pillar_chart.py]
+INFO: Incremental upload skipped 99.32% of data
+DEBUG: Skipping upload of [utils/data_parser.py]
+INFO: Incremental upload skipped 99.33% of data
+DEBUG: Skipping upload of [utils/thematic_helpers.py]
+INFO: Incremental upload skipped 99.33% of data
+DEBUG: Skipping upload of [source-context.json]
+INFO: Incremental upload skipped 99.33% of data
+DEBUG: Uploading 1 file to Google Cloud Storage
+DEBUG: Using [16] threads
+#============================================================#
+#= Uploading 1 file to Google Cloud Storage                 =#
+#INFO: Uploading [C:\Users\jqnmu\OneDrive\World_Bank_DRM\Cat_DDO_DRM_Diagnostic_Dashboard\deploy_log.txt] to [staging.drm-diagnostic-tool.appspot.com/4fc94dd9f37c0f3a5fd7ba21ac46b573b3545fce]
+DEBUG: Starting new HTTPS connection (1): storage.googleapis.com:443
+DEBUG: https://storage.googleapis.com:443 "POST /upload/storage/v1/b/staging.drm-diagnostic-tool.appspot.com/o?alt=json&name=4fc94dd9f37c0f3a5fd7ba21ac46b573b3545fce&uploadType=multipart HTTP/1.1" 200 1006
+DEBUG: Response size: 6785 bytes, but local file is 6592 bytes.
+INFO: Uploading [C:\Users\jqnmu\OneDrive\World_Bank_DRM\Cat_DDO_DRM_Diagnostic_Dashboard\deploy_log.txt] to [staging.drm-diagnostic-tool.appspot.com/4fc94dd9f37c0f3a5fd7ba21ac46b573b3545fce]
+DEBUG: https://storage.googleapis.com:443 "POST /upload/storage/v1/b/staging.drm-diagnostic-tool.appspot.com/o?alt=json&name=4fc94dd9f37c0f3a5fd7ba21ac46b573b3545fce&uploadType=multipart HTTP/1.1" 200 1006
+DEBUG: Response size: 7319 bytes, but local file is 7062 bytes.
+INFO: Uploading [C:\Users\jqnmu\OneDrive\World_Bank_DRM\Cat_DDO_DRM_Diagnostic_Dashboard\deploy_log.txt] to [staging.drm-diagnostic-tool.appspot.com/4fc94dd9f37c0f3a5fd7ba21ac46b573b3545fce]
+DEBUG: https://storage.googleapis.com:443 "POST /upload/storage/v1/b/staging.drm-diagnostic-tool.appspot.com/o?alt=json&name=4fc94dd9f37c0f3a5fd7ba21ac46b573b3545fce&uploadType=multipart HTTP/1.1" 200 1006
+DEBUG: Response size: 7783 bytes, but local file is 7526 bytes.
+INFO: Uploading [C:\Users\jqnmu\OneDrive\World_Bank_DRM\Cat_DDO_DRM_Diagnostic_Dashboard\deploy_log.txt] to [staging.drm-diagnostic-tool.appspot.com/4fc94dd9f37c0f3a5fd7ba21ac46b573b3545fce]
+DEBUG: https://storage.googleapis.com:443 "POST /upload/storage/v1/b/staging.drm-diagnostic-tool.appspot.com/o?alt=json&name=4fc94dd9f37c0f3a5fd7ba21ac46b573b3545fce&uploadType=multipart HTTP/1.1" 200 1006
+DEBUG: Response size: 8247 bytes, but local file is 7990 bytes.
+============================================================#
+DEBUG: One or more errors occurred:
+MaxRetrialsException: last_result=(None, (<class 'googlecloudsdk.calliope.exceptions.BadFileException'>, BadFileException('Cloud storage upload failure. Uploaded file does not match local file: C:\\Users\\jqnmu\\OneDrive\\World_Bank_DRM\\Cat_DDO_DRM_Diagnostic_Dashboard\\deploy_log.txt. Please retry.'), <traceback object at 0x000001C010F79480>)), last_retrial=3, time_passed_ms=1894,time_to_wait=0
+Traceback (most recent call last):
+  File "C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\lib\googlecloudsdk\calliope\cli.py", line 944, in Execute
+    resources = calliope_command.Run(cli=self, args=args)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\lib\googlecloudsdk\calliope\backend.py", line 955, in Run
+    resources = command_instance.Run(args)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\lib\surface\app\deploy.py", line 122, in Run
+    return deploy_util.RunDeploy(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\lib\googlecloudsdk\command_lib\app\deploy_util.py", line 677, in RunDeploy
+    deployer.Deploy(
+  File "C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\lib\googlecloudsdk\command_lib\app\deploy_util.py", line 458, in Deploy
+    manifest = self._PossiblyUploadFiles(image, service_info,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\lib\googlecloudsdk\command_lib\app\deploy_util.py", line 381, in _PossiblyUploadFiles
+    manifest = deploy_app_command_util.CopyFilesToCodeBucket(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\lib\googlecloudsdk\api_lib\app\deploy_app_command_util.py", line 307, in CopyFilesToCodeBucket
+    _UploadFilesThreads(files_to_upload, bucket_ref)
+  File "C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\lib\googlecloudsdk\api_lib\app\deploy_app_command_util.py", line 253, in _UploadFilesThreads
+    storage_parallel.UploadFiles(tasks, num_threads=num_threads,
+  File "C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\lib\googlecloudsdk\command_lib\storage\storage_parallel.py", line 256, in UploadFiles
+    ExecuteTasks(files_to_upload, num_threads, label)
+  File "C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\lib\googlecloudsdk\command_lib\storage\storage_parallel.py", line 234, in ExecuteTasks
+    pool.Map(lambda task: task.Execute(callback), tasks)
+  File "C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\lib\googlecloudsdk\core\util\parallel.py", line 100, in Map
+    return self.MapAsync(func, iterable).Get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\lib\googlecloudsdk\core\util\parallel.py", line 143, in Get
+    return self.GetResult().GetOrRaise()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\lib\googlecloudsdk\core\util\parallel.py", line 184, in GetOrRaise
+    raise self.error  # pylint: disable=raising-bad-type
+    ^^^^^^^^^^^^^^^^
+googlecloudsdk.core.util.parallel.MultiError: One or more errors occurred:
+MaxRetrialsException: last_result=(None, (<class 'googlecloudsdk.calliope.exceptions.BadFileException'>, BadFileException('Cloud storage upload failure. Uploaded file does not match local file: C:\\Users\\jqnmu\\OneDrive\\World_Bank_DRM\\Cat_DDO_DRM_Diagnostic_Dashboard\\deploy_log.txt. Please retry.'), <traceback object at 0x000001C010F79480>)), last_retrial=3, time_passed_ms=1894,time_to_wait=0
+ERROR: gcloud crashed (MultiError): One or more errors occurred:
+MaxRetrialsException: last_result=(None, (<class 'googlecloudsdk.calliope.exceptions.BadFileException'>, BadFileException('Cloud storage upload failure. Uploaded file does not match local file: C:\\Users\\jqnmu\\OneDrive\\World_Bank_DRM\\Cat_DDO_DRM_Diagnostic_Dashboard\\deploy_log.txt. Please retry.'), <traceback object at 0x000001C010F79480>)), last_retrial=3, time_passed_ms=1894,time_to_wait=0
+
+If you would like to report this issue, please run the following command:
+  gcloud feedback
+
+To check gcloud for common problems, please run the following command:
+  gcloud info --run-diagnostics

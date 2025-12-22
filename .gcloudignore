@@ -1,0 +1,13 @@
+.git
+.gitattributes
+.github
+.gitignore
+.vscode
+__pycache__
+venv/
+env/
+.env
+*.pyc
+*.pyo
+_old/
+deploy_log.txt
