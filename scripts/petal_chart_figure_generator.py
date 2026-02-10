@@ -98,7 +98,7 @@ def generate_figure(df_input):
         ))
     
     # Add bars - batch segments by color level for efficiency
-    n_segments = 50  # Reduced for performance, overlap fixes appearance
+    n_segments = 75  # Reduced for performance, overlap fixes appearance
     overlap = 0.02  # Small overlap to eliminate white gaps
     
     # Group all segments by their color level (across all bars)
@@ -314,13 +314,16 @@ def generate_figure(df_input):
             bgcolor='rgba(255,255,255,0.9)',
             bordercolor='#ddd',
             borderwidth=1,
-            font=dict(size=10)
+            font=dict(size=10),
+            itemclick=False,
+            itemdoubleclick=False
         ),
+        hovermode=False,
         paper_bgcolor='white',
         plot_bgcolor='white',  # Set plot area background to white
         autosize=True,  # Responsive width
         height=800,  # Increased height
-        margin=dict(l=40, r=40, t=40, b=40),
+        margin=dict(l=100, r=100, t=40, b=40),
         dragmode=False  # Disable zoom/pan
     )
     

@@ -16,7 +16,8 @@ app = dash.Dash(
         dbc.themes.BOOTSTRAP,
         "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     ],
-    suppress_callback_exceptions=True
+    suppress_callback_exceptions=True,
+    title="DRM Policy Diagnostic Tool"
 )
 server = app.server
 

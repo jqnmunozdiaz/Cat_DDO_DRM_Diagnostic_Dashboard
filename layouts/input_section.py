@@ -49,44 +49,29 @@ def get_input_section():
         html.Div([
             html.H3("Introduction", className="mb-3"),
             html.P([
-                html.Strong("A sound Disaster Risk Management (DRM) policy assessment requires a system-wide perspective. "), 
-                "Unlike traditional sectors, DRM cuts across infrastructure sectors, such as energy, water, transport, urban development, as well as socioenvironmental sectors, such as education, health, social protection and environmental management. Disaster risk also affects economic growth, fiscal stability and jobs. In short, disaster risk is a development challenge arising from the interaction of hazard, exposure, and vulnerability. While managing the immediate impacts of disasters is vital, building disaster resilience therefore requires a more comprehensive, multisectoral policy approach."
-            ], className="text-muted"),
-            html.P([
-                html.Strong("Recognizing this, the World Bank DRM framework provides a structured approach to evaluate a country's policy and institutional setup for DRM. "), 
-                "Drawing on practical country experiences and global good practices, this framework was first proposed in 'The Sendai Report' (Ghesquiere et al. 2012) and is aligned with the Sendai Framework for Disaster Risk Reduction. It is organized around six essential components of DRM encompassing not only legal and institutional DRM frameworks, but also key policy dimensions related to risk information, risk reduction at the sectoral and territorial level, emergency preparedness and response, financial protection and resilient recovery."
+                html.Strong("The objective of this web tool is to allow practitioners to conduct an assessment of the maturity of a country's Disaster Risk Management (DRM) system and identify the main policy gaps that may be constraining resilience-building efforts. "), 
+                "Recognizing that a comprehensive DRM policy diagnostic requires a system-wide perspective, this tool is organized around the World Bank’s DRM framework, which outlines six key DRM policy dimensions. The reader is referred to the accompanying Methodological Note for a thorough description of the DRM framework and this tool."
             ], className="text-muted"),
             html.Div([
                 html.Img(src="/assets/images/Policy_Framework.png", 
                          style={"maxWidth": "100%", "height": "auto", "display": "block", "margin": "0 auto", "marginBottom": "20px"})
             ], className="text-center mt-3"),
-            html.P([
-                html.Strong("Building upon this framework, the proposed diagnostic tool enables task teams to conduct a standardized assessment of the maturity of a country's DRM system. The goal is to identify the main policy gaps that may be constraining resilience-building efforts across each DRM pillar.")
-            ], className="text-muted"),
         ], className="mb-4"),
         
         # Guidelines section
         html.Div([
-            html.H3("Guidelines for Using the Tool", className="mb-3"),
             html.P([
-                html.Strong("The tool assesses each DRM pillar using a set of closed questions presented in an Excel-based questionnaire."), 
-                " Task teams can download the file for offline completion. To ensure objectivity and speed, teams are asked to provide a \"Yes\" or \"No\" answer. This answer must be based on official documents that justify the existence of a series of legal, regulatory, institutional, and budgetary conditions that are considered fundamental for managing disaster risk."
-            ], className="text-muted"),
-            html.P([
-                "This is a high-level assessment designed to be completed quickly. If information for a question is unavailable, teams are encouraged to consult other Global Practice (GP) colleagues or national counterparts. This is particularly relevant under Pillar 3, where inputs from colleagues in the Water, Transport, Education, Health, and Agriculture GP can greatly help in gathering information. Users can also answer \"Unknown\", in which case the question will be scored as \"No\"."
-            ], className="text-muted"),
-            html.P([
-                "Once all questions are completed, copy/paste the content of the Excel below to generate key metrics and visual outputs."
-            ], className="text-muted"),
-
+                html.Strong("This is a high-level assessment designed to be objective and quick."), 
+                " The tool assesses each DRM pillar using a set of closed Yes/No questions presented in an offline questionnaire. Users should review official documentation (legal, regulatory, institutional, and budgetary) and consult with colleagues and national authorities to provide an informed answer. This is particularly relevant for cross-cutting questions, where inputs from colleagues from sectors such as Water, Transport, Education, Health, and Agriculture may help in gathering information. Once all questions are completed, the web tool will generate key metrics and visual outputs."
+            ], className="text-muted")
         ], className="mb-4"),
-        
+                    
         # Input Form
         html.Div([
             # Country selection dropdown
             dbc.Row([
                 dbc.Col([
-                    html.Label("Select Country:", className="fw-bold mb-2"),
+                    html.Label("1. Select the country:", className="fw-bold mb-2"),
                     dcc.Dropdown(
                         id="country-dropdown",
                         options=[{"label": country, "value": country} for country in COUNTRIES],
@@ -120,7 +105,7 @@ def get_input_section():
             
             # Paste area
             html.Div([
-                html.Label("Please paste the data from cell B10 of your spreadsheet after completing the diagnostic:", className="form-label fw-semibold"),
+                html.Label("2. Copy and paste the data from cell B10 of the spreadsheet after completing the diagnostic:", className="form-label fw-bold"),
                 dcc.Textarea(id="paste-input", placeholder="",
                             style={"width": "100%", "height": "110px", "fontFamily": "monospace"}),
                 html.Div([
