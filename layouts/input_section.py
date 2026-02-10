@@ -78,6 +78,7 @@ def get_input_section():
             html.P([
                 "Once all questions are completed, copy/paste the content of the Excel below to generate key metrics and visual outputs."
             ], className="text-muted"),
+
         ], className="mb-4"),
         
         # Input Form
@@ -104,10 +105,16 @@ def get_input_section():
                         [html.I(className="fas fa-download me-2"), "Download Diagnostic Questionnaire"],
                         id="download-template-button",
                         color="primary",
-                        className="mb-3",
+                        className="mb-3 me-2",
                         n_clicks=0
                     ),
-                    dcc.Download(id="download-template")
+                    dcc.Download(id="download-template"),
+                    html.A(
+                        [html.I(className="fas fa-file-pdf me-2"), "Download Methodological Note"],
+                        href="/assets/documents/DRM Policy Tool - Methodological Note.pdf",
+                        download="DRM Policy Tool - Methodological Note.pdf",
+                        className="btn btn-primary mb-3"
+                    ),
                 ], width=12)
             ]),
             
