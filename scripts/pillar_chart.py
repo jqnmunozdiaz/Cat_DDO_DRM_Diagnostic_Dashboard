@@ -44,7 +44,7 @@ def generate_pillar_chart(df: pd.DataFrame) -> go.Figure:
     
     # Apply text colors to pillar labels
     colored_labels = [
-        f'<span style="color:{tc}">{label}</span>' 
+        f'<span style="color:{tc}"><b>{label}</b></span>' 
         for label, tc in zip(pillar_labels, text_colors)
     ]
     
@@ -61,20 +61,22 @@ def generate_pillar_chart(df: pd.DataFrame) -> go.Figure:
     
     progress_fig.update_layout(
         xaxis=dict(
-            title="Achievement",
+            title="<b>Progress</b>",
             range=[0, 105],  # Extended slightly beyond 100 to show the 100% gridline
             showgrid=True,
             gridcolor='lightgray',
             tickmode='array',
             tickvals=[0, 25, 50, 75, 100],
-            ticktext=['-', 'Nascent', 'Emerging', 'Established', 'Mature']
+            ticktext=['-', 'Nascent', 'Emerging', 'Established', 'Mature'],
+            fixedrange=True
         ),
         yaxis=dict(
             title="",
-            autorange="reversed"
+            autorange="reversed",
+            fixedrange=True
         ),
         height=max(300, len(pillars) * 60),
-        margin=dict(l=20, r=80, t=20, b=60),
+        margin=dict(l=80, r=140, t=20, b=60),
         plot_bgcolor='white',
         paper_bgcolor='white',
         font=dict(size=12)

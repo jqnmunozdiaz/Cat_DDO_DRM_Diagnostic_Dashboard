@@ -20,13 +20,13 @@ def get_header():
         # Title
         dbc.Row([
             dbc.Col([
-                html.H1("A Disaster Risk Management Policy Diagnostic Tool", className="mb-2 text-center"),
+                html.H1("Disaster Risk Management Policy Diagnostic Tool", className="mb-2 text-center"),
                 html.P(
                     "Evaluate your country's policy and institutional setting for Disaster Risk Management across six critical pillars",
                     className="text-center text-muted mb-4 lead"
                 ),
                 dbc.Alert(
-                    "Prototype: this will be updated following test cases. Your feedback is welcomed.",
+                    [html.B("Prototype"), ": this will be updated following test cases. Your feedback is welcomed."],
                     color="info",
                     className="mb-4 text-center"
                 )

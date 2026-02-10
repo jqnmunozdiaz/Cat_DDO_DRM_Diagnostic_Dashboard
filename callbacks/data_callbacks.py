@@ -133,19 +133,22 @@ def register_data_callbacks(app):
             figure_html = html.Div([
                 html.Div([
                     html.H5("Results by Thematic Area", className="mb-3 mt-0"),
-                    dbc.Button(
-                        "Download Figure",
-                        id="download-button",
-                        color="success",
-                        outline=True,
-                        size="sm",
-                        className="mt-0"
-                    )
-                ], style={"display": "flex", "alignItems": "flex-start", "justifyContent": "space-between"}, className="mb-3"),
+                ], style={"display": "flex", "alignItems": "center", "justifyContent": "space-between"}, className="mb-3"),
                 dcc.Graph(
                     id="petal-chart",
                     figure=petal_fig,
-                    config={'displayModeBar': False},
+                    config={
+                        'displayModeBar': True,
+                        'displaylogo': False,
+                        'modeBarButtonsToRemove': ['lasso2d', 'select2d', 'zoom2d', 'pan2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
+                        'toImageButtonOptions': {
+                            'format': 'png', 
+                            'filename': 'DRM_Assessment_Result',
+                            'height': 800, 
+                            'width': 800, 
+                            'scale': 2
+                        }
+                    },
                     style={"maxWidth": "100%", "height": "auto", "borderRadius": "8px", "boxShadow": "0 2px 8px rgba(0,0,0,0.1)"}
                 ),
                 dcc.Download(id="download-image")
