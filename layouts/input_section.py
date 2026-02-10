@@ -76,7 +76,7 @@ def get_input_section():
                 "This is a high-level assessment designed to be completed quickly. If information for a question is unavailable, teams are encouraged to consult other Global Practice (GP) colleagues or national counterparts. This is particularly relevant under Pillar 3, where inputs from colleagues in the Water, Transport, Education, Health, and Agriculture GP can greatly help in gathering information."
             ], className="text-muted"),
             html.P([
-                "Once all questions are completed, copy/paste the content of the Excel below. The system will automatically generate key metrics and visual outputs."
+                "Once all questions are completed, copy/paste the content of the Excel below to generate key metrics and visual outputs."
             ], className="text-muted"),
         ], className="mb-4"),
         
