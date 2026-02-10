@@ -64,15 +64,20 @@ def get_results_section():
         
         # Progress bars by pillar
         html.Div([
-            html.H5("Results by DRM Pillar", className="mb-3 mt-0"),
-            dcc.Graph(id="pillar-progress-bars", 
-                     config={
-                         'displayModeBar': True,
-                         'modeBarButtonsToRemove': ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
-                         'modeBarButtonsToAdd': [],
-                         'toImageButtonOptions': {'format': 'png', 'filename': 'DRM_Pillar_Progress', 'scale': 2}
-                     },
-                     style={"maxWidth": "100%", "height": "auto", "borderRadius": "8px", "boxShadow": "0 2px 8px rgba(0,0,0,0.1)"})
+            html.Div([
+                html.H5("Results by DRM Pillar", className="mb-3 mt-0"),
+                dbc.Button(
+                    "Download Figure",
+                    id="download-pillar-button",
+                    color="success",
+                    outline=True,
+                    size="sm",
+                    className="mt-0"
+                )
+            ], style={"display": "flex", "alignItems": "flex-start", "justifyContent": "space-between"}, className="mb-3"),
+            dcc.Graph(id="pillar-progress-bars", config={'displayModeBar': False},
+                     style={"maxWidth": "100%", "height": "auto", "borderRadius": "8px", "boxShadow": "0 2px 8px rgba(0,0,0,0.1)"}),
+            dcc.Download(id="download-pillar-image")
         ], className="mb-4"),
         
         # Analysis text
