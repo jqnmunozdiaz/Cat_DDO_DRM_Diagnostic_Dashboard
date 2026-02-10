@@ -66,3 +66,36 @@ h3 {
     font-size: 1.1rem;
     font-weight: 500;
 }
+
+/* Print styles for PDF download */
+@media print {
+    body {
+        background: white !important;
+        padding: 0 !important;
+    }
+    .container-fluid, .container {
+        box-shadow: none !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+    .section-2 {
+        border: none !important;
+        background-color: white !important;
+    }
+    #download-results-pdf,
+    #download-button,
+    #download-pillar-button,
+    #back-button,
+    a[download] {
+        display: none !important;
+    }
+    .js-plotly-plot {
+        break-inside: avoid;
+    }
+    .alert {
+        break-inside: avoid;
+    }
+    .mb-4 {
+        break-inside: avoid;
+    }
+}

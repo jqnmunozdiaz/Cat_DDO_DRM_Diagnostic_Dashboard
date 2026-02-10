@@ -73,11 +73,12 @@ def get_input_section():
                 " Task teams can download the file for offline completion. To ensure objectivity and speed, teams are asked to provide a \"Yes\" or \"No\" answer. This answer must be based on official documents that justify the existence of a series of legal, regulatory, institutional, and budgetary conditions that are considered fundamental for managing disaster risk."
             ], className="text-muted"),
             html.P([
-                "This is a high-level assessment designed to be completed quickly. If information for a question is unavailable, teams are encouraged to consult other Global Practice (GP) colleagues or national counterparts. This is particularly relevant under Pillar 3, where inputs from colleagues in the Water, Transport, Education, Health, and Agriculture GP can greatly help in gathering information."
+                "This is a high-level assessment designed to be completed quickly. If information for a question is unavailable, teams are encouraged to consult other Global Practice (GP) colleagues or national counterparts. This is particularly relevant under Pillar 3, where inputs from colleagues in the Water, Transport, Education, Health, and Agriculture GP can greatly help in gathering information. Users can also answer \"Unknown\", in which case the question will be scored as \"No\"."
             ], className="text-muted"),
             html.P([
                 "Once all questions are completed, copy/paste the content of the Excel below to generate key metrics and visual outputs."
             ], className="text-muted"),
+
         ], className="mb-4"),
         
         # Input Form
@@ -104,10 +105,16 @@ def get_input_section():
                         [html.I(className="fas fa-download me-2"), "Download Diagnostic Questionnaire"],
                         id="download-template-button",
                         color="primary",
-                        className="mb-3",
+                        className="mb-3 me-2",
                         n_clicks=0
                     ),
-                    dcc.Download(id="download-template")
+                    dcc.Download(id="download-template"),
+                    html.A(
+                        [html.I(className="fas fa-file-pdf me-2"), "Download Methodological Note"],
+                        href="/assets/documents/DRM Policy Tool - Methodological Note.pdf",
+                        download="DRM Policy Tool - Methodological Note.pdf",
+                        className="btn btn-primary mb-3"
+                    ),
                 ], width=12)
             ]),
             

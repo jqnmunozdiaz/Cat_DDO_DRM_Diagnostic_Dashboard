@@ -8,16 +8,31 @@ import dash_bootstrap_components as dbc
 def get_results_section():
     """Return the results section with charts and summaries"""
     return html.Div([
-        # Title with Back button on the right
         html.Div([
-            html.H3("Assessment Results", className="mb-3 mt-0"),
-            dbc.Button("Back", id="back-button", color="secondary", outline=True, size="sm", className="mt-0")
-        ], className="mb-4", style={"display": "flex", "alignItems": "flex-start", "justifyContent": "space-between"}),
+            html.H3("Assessment Results", className="mb-0", style={"marginTop": "0"}),
+            html.Div([
+                dbc.Button(
+                    [html.I(className="fas fa-download me-2"), "Download Results"],
+                    id="download-results-pdf",
+                    color="primary",
+                    size="sm",
+                    className="mt-0 me-2"
+                ),
+                html.A(
+                    [html.I(className="fas fa-file-pdf me-2"), "Download Methodological Note"],
+                    href="/assets/documents/DRM Policy Tool - Methodological Note.pdf",
+                    download="DRM Policy Tool - Methodological Note.pdf",
+                    className="btn btn-primary btn-sm mt-0 me-2"
+                ),
+                dbc.Button("Back", id="back-button", color="secondary", outline=True, size="sm", className="mt-0")
+            ])
+        ], className="mb-4 mt-5", style={"display": "flex", "alignItems": "center", "justifyContent": "space-between"}),
         
         # Interpreting the Results section
         html.Div([
             html.P([
-                "The petal diagram encapsulates the assessment results. Each petal represents a thematic area of the DRM framework, grouped by thematic area. Below the diagram, results are aggregated by DRM pillar to highlight key drivers and gaps."
+                html.Strong("The petal diagram encapsulates the assessment results."),
+                " Each petal represents a thematic area of the DRM framework, grouped by thematic area. Below the diagram, results are aggregated by DRM pillar to highlight key drivers and gaps."
             ], className="text-muted"),
             
             html.Ul([
@@ -30,7 +45,8 @@ def get_results_section():
         # Closing interpretation text
         html.Div([
             html.P([
-                "The diagnostic should be seen as a starting point for structuring a DRM policy dialogue—not as a final evaluation. Shorter petals indicate areas where the policy framework is weak and/or not producing the expected outcomes. Depending on a range of factors (e.g., political momentum, internal resources, country prioritization), this policy area may be prioritized for further support. Ultimately, this tool supports policy dialogue—whether to inform the preparation of a Cat DDO operation or to guide Technical Assistance—helping countries shift from reactive disaster response toward a proactive, strategic approach to managing disaster and climate-related risks."
+                html.Strong("The diagnostic should be seen as a starting point for structuring a DRM policy dialogue—not as a final evaluation."),
+                " Shorter petals indicate areas where the policy framework is weak and/or not producing the expected outcomes. Depending on a range of factors (e.g., political momentum, internal resources, country prioritization), this policy area may be prioritized for further support. Ultimately, this tool supports policy dialogue—whether to inform the preparation of a Cat DDO operation or to guide Technical Assistance—helping countries shift from reactive disaster response toward a proactive, strategic approach to managing disaster and climate-related risks."
             ], className="text-muted"),
             
             html.P([
@@ -75,4 +91,4 @@ def get_results_section():
             # Dynamic summaries container
             html.Div(id="thematic-summaries-container")
         ], className="mb-4")
-    ], id="results-section", className="section-2 p-4 border rounded", style={"display": "none", "backgroundColor": "#f8f9fa"})
+    ], id="results-section", style={"display": "none"})

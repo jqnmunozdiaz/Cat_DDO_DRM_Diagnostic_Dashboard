@@ -15,7 +15,7 @@ app = dash.Dash(
     external_stylesheets=[
         dbc.themes.BOOTSTRAP,
         "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    ], 
+    ],
     suppress_callback_exceptions=True
 )
 server = app.server
@@ -25,7 +25,6 @@ app.layout = layout
 
 # Register callbacks
 register_callbacks(app)
-
 
 if __name__ == '__main__':
     # Use debug=True for development (auto-reload on code changes)
