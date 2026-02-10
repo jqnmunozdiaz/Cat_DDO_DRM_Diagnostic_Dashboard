@@ -26,7 +26,6 @@ app.layout = layout
 # Register callbacks
 register_callbacks(app)
 
-
 if __name__ == '__main__':
     # Use debug=True for development (auto-reload on code changes)
     # Set to False for production deployment

@@ -34,8 +34,8 @@ def parse_pasted_data(raw_text: str):
             return None, f"Unknown question ID: {q_id}"
         
         # Validate answer
-        if answer.lower() not in ["yes", "no"]:
-            return None, f"Invalid answer for {q_id} (must be Yes or No): {answer}"
+        if answer.lower() not in ["yes", "no", "unknown"]:
+            return None, f"Invalid answer for {q_id} (must be Yes, No, or Unknown): {answer}"
         
         # Parse weight
         try:
@@ -45,7 +45,7 @@ def parse_pasted_data(raw_text: str):
         except ValueError:
             return None, f"Invalid weight for {q_id}: {weight}"
         
-        # Calculate score: if Yes, score = weight; if No, score = 0
+        # Calculate score: if Yes, score = weight; if No or Unknown, score = 0
         score = weight_val if answer.lower() == "yes" else 0
         
         question_data[q_id] = {

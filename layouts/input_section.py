@@ -73,10 +73,10 @@ def get_input_section():
                 " Task teams can download the file for offline completion. To ensure objectivity and speed, teams are asked to provide a \"Yes\" or \"No\" answer. This answer must be based on official documents that justify the existence of a series of legal, regulatory, institutional, and budgetary conditions that are considered fundamental for managing disaster risk."
             ], className="text-muted"),
             html.P([
-                "This is a high-level assessment designed to be completed quickly. If information for a question is unavailable, teams are encouraged to consult other Global Practice (GP) colleagues or national counterparts. This is particularly relevant under Pillar 3, where inputs from colleagues in the Water, Transport, Education, Health, and Agriculture GP can greatly help in gathering information."
+                "This is a high-level assessment designed to be completed quickly. If information for a question is unavailable, teams are encouraged to consult other Global Practice (GP) colleagues or national counterparts. This is particularly relevant under Pillar 3, where inputs from colleagues in the Water, Transport, Education, Health, and Agriculture GP can greatly help in gathering information. Users can also answer \"Unknown\", in which case the question will be scored as \"No\"."
             ], className="text-muted"),
             html.P([
-                "Once all questions are completed, copy/paste the content of the Excel below. The system will automatically generate key metrics and visual outputs."
+                "Once all questions are completed, copy/paste the content of the Excel below to generate key metrics and visual outputs."
             ], className="text-muted"),
         ], className="mb-4"),
         
