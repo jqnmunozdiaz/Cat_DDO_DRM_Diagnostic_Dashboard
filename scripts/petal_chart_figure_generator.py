@@ -98,7 +98,7 @@ def generate_figure(df_input):
         ))
     
     # Add bars - batch segments by color level for efficiency
-    n_segments = 50  # Reduced for performance, overlap fixes appearance
+    n_segments = 100  # Reduced for performance, overlap fixes appearance
     overlap = 0.02  # Small overlap to eliminate white gaps
     
     # Group all segments by their color level (across all bars)
