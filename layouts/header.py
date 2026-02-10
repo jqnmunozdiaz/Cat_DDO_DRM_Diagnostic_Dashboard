@@ -22,7 +22,7 @@ def get_header():
             dbc.Col([
                 html.H1("Disaster Risk Management Policy Diagnostic Tool", className="mb-2 text-center"),
                 html.P(
-                    "Evaluate your country's policy and institutional setting for Disaster Risk Management across six critical pillars",
+                    "Evaluate a country's policy and institutional setting for Disaster Risk Management across six critical pillars",
                     className="text-center text-muted mb-4 lead"
                 ),
                 dbc.Alert(
