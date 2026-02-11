@@ -118,7 +118,7 @@ def get_input_section():
                 dbc.Collapse(
                     [
                         html.P(
-                            "Enter the text following the required format. You can copy and paste the following example to proceed.",
+                            "You can copy the following text of an example diagnostic and paste it in the box above to see how the tool works.",
                             className="form-text text-muted mb-2"
                         ),
                         dbc.Card(dbc.CardBody([
