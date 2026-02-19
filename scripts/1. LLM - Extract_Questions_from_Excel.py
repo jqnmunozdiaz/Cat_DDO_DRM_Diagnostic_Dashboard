@@ -6,7 +6,7 @@ from pathlib import Path
 # Define paths
 script_dir = Path(__file__).parent
 project_root = script_dir.parent
-excel_path = project_root / "data" / "DRM System Diagnostic Assessment - Template.xlsx"
+excel_path = project_root / "data" / "DRM System Rapid Screening Tool - Questionnaire.xlsx"
 output_dir = project_root / "LLM"
 output_file = output_dir / "questions_mapping.json"
 
