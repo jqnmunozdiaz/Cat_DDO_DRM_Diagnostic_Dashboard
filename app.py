@@ -17,7 +17,7 @@ app = dash.Dash(
         "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     ],
     suppress_callback_exceptions=True,
-    title="DRM System Rapid Screening Tool"
+    title="DRM Rapid Screening Tool"
 )
 server = app.server
 

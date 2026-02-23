@@ -14,4 +14,4 @@ def register_download_callbacks(app):
     )
     def download_template(n_clicks):
         """Download the DRM System Diagnostic Assessment Template"""
-        return dcc.send_file("data/DRM System Rapid Screening Tool - Questionnaire.xlsx")
+        return dcc.send_file("data/DRM Rapid Screening Tool - Questionnaire.xlsx")
