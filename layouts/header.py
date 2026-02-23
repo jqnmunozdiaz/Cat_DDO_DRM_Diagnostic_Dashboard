@@ -20,7 +20,11 @@ def get_header():
         # Title
         dbc.Row([
             dbc.Col([
-                html.H1("Evaluating DRM Policy Frameworks: A Rapid Screening Tool", className="mb-2 text-center"),
+                html.H1([
+                    "Evaluating DRM Policy Frameworks:",
+                    html.Br(),
+                    "A Rapid Screening Tool"
+                ], className="mb-2 text-center"),
                 html.P(
                     "Evaluate a country's policy and institutional setting for Disaster Risk Management across six critical pillars",
                     className="text-center text-muted mb-4 lead"
