@@ -11,9 +11,9 @@ def get_header():
         dbc.Row([
             dbc.Col([
                 html.Div([
-                    html.Img(src="/assets/images/wb-full-logo.png", height="60px", className="me-3"),
-                    html.Img(src="/assets/images/gfdrr-logo.png", height="60px")
-                ], style={"display": "flex", "alignItems": "center", "justifyContent": "center", "marginBottom": "20px", "gap": "20px"})
+                    html.Img(src="/assets/images/wb-full-logo.png", height="110px", className="me-3"),
+                    html.Img(src="/assets/images/gfdrr-logo.png", height="85px")
+                ], style={"display": "flex", "alignItems": "center", "justifyContent": "center", "marginTop": "30px", "marginBottom": "20px", "gap": "20px"})
             ], width=12)
         ]),
         
