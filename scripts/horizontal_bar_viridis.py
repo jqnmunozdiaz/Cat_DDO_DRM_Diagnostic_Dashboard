@@ -6,7 +6,6 @@ Creates a horizontal bar chart demonstrating the Viridis color gradient.
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-import numpy as np
 
 # Define Viridis color map
 VIRIDIS_COLORS = [
@@ -84,7 +83,7 @@ for label, position in maturity_labels:
 plt.tight_layout(pad=0.2)
 
 # Save the figure
-output_path = 'G:/My Drive/World_Bank_DRM/Cat_DDO_DRM_Diagnostic_Dashboard/outputs/horizontal_bar_viridis.png'
+output_path = 'G:/My Drive/World_Bank_DRM/Cat_DDO_DRM_Diagnostic_Dashboard/assets/images/horizontal_bar_viridis.png'
 plt.savefig(output_path, dpi=300, bbox_inches='tight')
 print(f"Chart saved to: {output_path}")
 

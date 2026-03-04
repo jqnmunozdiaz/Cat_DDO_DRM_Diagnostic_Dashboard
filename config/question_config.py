@@ -13,15 +13,14 @@ THEMATIC_AREA_QUESTIONS = [
     {"pillar": "2. Risk Identification", "thematic": "Risk identification", "questions": "Q7-Q10"},
     {"pillar": "3. Risk Reduction", "thematic": "3.1. Territorial and urban planning", "questions": "Q11-Q14"},
     {"pillar": "3. Risk Reduction", "thematic": "3.2. Public investment at the central level", "questions": "Q15-Q17"},
-    {"pillar": "3. Risk Reduction", "thematic": "3.3. Sector-specific risk reduction measures", "questions": "Q18-Q27"},
-    {"pillar": "4. Preparedness", "thematic": "4.1. Early warning systems", "questions": "Q28-Q30"},
-    {"pillar": "4. Preparedness", "thematic": "4.2. Emergency preparedness and response", "questions": "Q31-Q34"},
-    {"pillar": "4. Preparedness", "thematic": "4.3. Adaptive social protection", "questions": "Q35-Q37"},
-    {"pillar": "5. Financial Protection", "thematic": "5.1. Fiscal risk management", "questions": "Q38-Q41"},
-    {"pillar": "5. Financial Protection", "thematic": "5.2. DRF strategies and instruments", "questions": "Q42-Q44"},
-    {"pillar": "6. Resilient Reconstruction", "thematic": "Resilient reconstruction", "questions": "Q45-Q47"},
+    {"pillar": "3. Risk Reduction", "thematic": "3.3. Sector-specific risk reduction measures", "questions": "Q18-Q26"},
+    {"pillar": "4. Preparedness", "thematic": "4.1. Early warning systems", "questions": "Q27-Q29"},
+    {"pillar": "4. Preparedness", "thematic": "4.2. Emergency preparedness and response", "questions": "Q30-Q33"},
+    {"pillar": "4. Preparedness", "thematic": "4.3. Adaptive social protection", "questions": "Q34-Q36"},
+    {"pillar": "5. Financial Protection", "thematic": "5.1. Fiscal risk management", "questions": "Q37-Q40"},
+    {"pillar": "5. Financial Protection", "thematic": "5.2. DRF strategies and instruments", "questions": "Q41-Q43"},
+    {"pillar": "6. Resilient Reconstruction", "thematic": "Resilient reconstruction", "questions": "Q44-Q46"},
 ]
-
 
 def parse_question_range(range_str):
     """Parse question range string like 'Q1-Q4' into list of question IDs"""

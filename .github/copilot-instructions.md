@@ -13,7 +13,7 @@ This is a **Dash-based single-page web application** for World Bank/GFDRR that e
 ### Core Components
 1. **[app.py](app.py)** - Main Dash application (~610 lines)
    - Hard-codes question-to-pillar mapping (QUESTION_MAPPING dict with Q1-Q47)
-   - Parses semicolon-delimited Q#,Answer,Weight format from Excel cell B10
+   - Parses ampersand-delimited Q#;Answer;Weight format from Excel cell B10
    - Manages UI state via `dcc.Store` components and section visibility toggling
    - Implements 6 callbacks for data processing, visualization, and downloads
 
@@ -26,15 +26,15 @@ This is a **Dash-based single-page web application** for World Bank/GFDRR that e
 3. **[data/DRM System Diagnostic Assessment - Template.xlsx](data/DRM%20System%20Diagnostic%20Assessment%20-%20Template.xlsx)** - Source template
    - Users complete this offline Excel file with 47 Yes/No questions
    - Contains formula in cell B10 that formats data for pasting
-   - Structure: Excel answers → `Q#,Answer,Weight;Q#,Answer,Weight;...`
+   - Structure: Excel answers → `Q#;Answer;Weight&Q#;Answer;Weight&...`
 
 ### Data Model
-**Input format** (semicolon-separated question entries):
+**Input format** (ampersand-separated question entries):
 ```
-Q1,Yes,1;Q2,No,1;Q3,No,0.5;Q4,Yes,0.5;...;Q47,Yes,1
+Q1;Yes;1&Q2;No;1&Q3;Partially;0,5&Q4;Yes;0.5&...&Q47;Yes;1
 ```
 
-Each entry has three parts: `Question ID, Answer (Yes/No), Weight (0-1)`
+Each entry has three parts: `Question ID, Answer (Yes/No/Partially/Unknown), Weight (0-1)`
 
 **Question mapping**: 47 questions (Q1-Q47) map to 12 thematic areas across 6 pillars
 - Q1-Q4 → Pillar 1.1 (DRM policies and institutions)
@@ -45,7 +45,7 @@ Each entry has three parts: `Question ID, Answer (Yes/No), Weight (0-1)`
 - Q38-Q44 → Pillar 5 (Financial Protection - 2 sub-areas)
 - Q45-Q47 → Pillar 6 (Resilient Reconstruction)
 
-**Scoring logic**: Answer="Yes" → score = weight; Answer="No" → score = 0. Scores aggregate by thematic area to create "petal length" (max ~4.0 per area).
+**Scoring logic**: Answer="Yes" → score = weight; Answer="Partially" → score = weight * 0.5; Answer="No" or "Unknown" → score = 0. Scores aggregate by thematic area to create "petal length" (max ~4.0 per area).
 
 ### Critical Workflows
 
@@ -65,8 +65,8 @@ python app.py
 - No environment variables required
 
 **Understanding the calculation logic**:
-- Each question has Answer (Yes/No) and Weight (0-1 float)
-- Score = Weight if Yes, 0 if No
+- Each question has Answer (Yes/No/Partially/Unknown) and Weight (0-1 float, comma or dot decimals allowed)
+- Score = Weight if Yes, Half Weight if Partially, 0 if No/Unknown
 - Questions aggregate to thematic area scores (sum of individual question scores)
 - Thematic area scores < 1.0 flagged as "Below Minimum Standard" (red circle)
 - Pillar progress = average of thematic area scores within that pillar
@@ -112,12 +112,12 @@ All callbacks use `prevent_initial_call=True` to avoid execution on page load. K
 4. No changes to parsing logic needed - it auto-processes all Q# entries
 
 ### Debugging Data Parsing Issues
-- Check paste format in browser console - must have `;` entry delimiters and `,` field delimiters
-- Each entry must be exactly 3 parts: `Q#,Yes/No,Weight`
+- Check paste format in browser console - must have `&` entry delimiters and `;` field delimiters
+- Each entry must be exactly 3 parts: `Q#;Yes/No/Partially/Unknown;Weight`
 - Validation errors shown via `html.Div(className="alert alert-danger")` below paste textarea
 - Question ID must exist in `QUESTION_MAPPING` (Q1-Q47)
-- Answer must be "Yes" or "No" (case-insensitive)
-- Weight must be valid float between 0 and 1
+- Answer must be "Yes", "No", "Partially", or "Unknown" (case-insensitive)
+- Weight must be valid float between 0 and 1 (commas like 0,5 are auto-converted to dots)
 
 ## Dependencies & Compatibility
 
@@ -140,8 +140,8 @@ All callbacks use `prevent_initial_call=True` to avoid execution on page load. K
 - Use "Show Example" button to load pre-formatted sample data
 - Example data: 47-question string in correct format
 - Verify charts render with: 12 petals (thematic areas), 6 group labels (pillars), 4 reference circles
-- Test edge cases: missing questions (default to 0), invalid Q# (error), non-Yes/No answers (error), weights outside 0-1 (error)
-- Sample test: `Q1,Yes,1;Q2,No,1` should aggregate to score of 1.0 for Pillar 1.1
+- Test edge cases: missing questions (default to 0), invalid Q# (error), invalid answers (error), weights outside 0-1 (error)
+- Sample test: `Q1;Yes;1&Q2;No;1` should aggregate to score of 1.0 for Pillar 1.1
 
 ## Anti-Patterns to Avoid
 - Don't create multi-page navigation - this is intentionally single-page with section toggling
