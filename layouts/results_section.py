@@ -51,6 +51,7 @@ def get_results_section():
             ], style={"display": "flex", "alignItems": "flex-start", "justifyContent": "space-between"}, className="mb-3"),
             dcc.Graph(id="pillar-progress-bars", 
                      config={
+                        'responsive': True,
                         'displayModeBar': True,
                         'displaylogo': False,
                         'modeBarButtonsToRemove': ['lasso2d', 'select2d', 'zoom2d', 'pan2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
@@ -79,7 +80,7 @@ def get_results_section():
             html.P([
                 html.I(className="fas fa-info-circle me-2"),
                 "This text was generated automatically by a Large Language Model (LLM). Users should verify the content and cross-reference with official documentation. For the purpose of generating these text summaries, 'Partially' and 'Unknown' answers are treated the same as 'No'."
-            ], className="text-muted fst-italic small mb-3", style={"backgroundColor": "#fff3cd", "padding": "10px", "borderRadius": "5px", "border": "1px solid #ffc107"})
+            ], className="text-muted fst-italic small mb-3", style={"backgroundColor": "#fff3cd", "padding": "10px", "borderRadius": "5px", "border": "1px solid #ffc107", "WebkitPrintColorAdjust": "exact", "printColorAdjust": "exact"})
         ]),
         
         # Dynamic summaries container

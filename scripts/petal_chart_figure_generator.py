@@ -323,7 +323,7 @@ def generate_figure(df_input):
         plot_bgcolor='white',  # Set plot area background to white
         autosize=True,  # Responsive width
         height=800,  # Increased height
-        margin=dict(l=100, r=100, t=40, b=40),
+        margin=dict(l=140, r=220, t=40, b=40),
         dragmode=False  # Disable zoom/pan
     )
     

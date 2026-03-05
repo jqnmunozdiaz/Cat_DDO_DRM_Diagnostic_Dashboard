@@ -71,14 +71,13 @@ h3 {
 /* Print styles for PDF download */
 @media print {
     @page {
-        margin: 0mm;
+        margin: 1.5cm;
         size: auto;
     }
 
     body {
         background: white !important;
-        padding: 1.5cm !important;
-        padding-top: 2.5cm !important;
+        padding: 0 !important;
     }
 
     .container-fluid,
@@ -111,6 +110,5 @@ h3 {
 
     .mb-4 {
         break-inside: avoid;
-        padding-top: 1.5cm !important;
     }
 }

@@ -139,7 +139,7 @@ def register_data_callbacks(app):
             # Use darker text color for lighter backgrounds (high scores in Viridis scale)
             level_text_color = "black" if score >= 0.75 else "white"
                 
-            badge = html.Span(level_str, className="badge ms-2", style={"backgroundColor": level_bg, "color": level_text_color, "fontSize": "0.8em", "fontWeight": "normal", "verticalAlign": "middle", "border": "1px solid rgba(0,0,0,0.1)"})
+            badge = html.Span(level_str, className="badge ms-2", style={"backgroundColor": level_bg, "color": level_text_color, "fontSize": "0.8em", "fontWeight": "normal", "verticalAlign": "middle", "border": "1px solid rgba(0,0,0,0.1)", "WebkitPrintColorAdjust": "exact", "printColorAdjust": "exact"})
             
             # Check for unknown answers
             area_question_ids = parse_question_range(area_config["questions"])
@@ -180,6 +180,7 @@ def register_data_callbacks(app):
                     id="petal-chart",
                     figure=petal_fig,
                     config={
+                        'responsive': True,
                         'displayModeBar': True,
                         'displaylogo': False,
                         'modeBarButtonsToRemove': ['lasso2d', 'select2d', 'zoom2d', 'pan2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
