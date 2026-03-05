@@ -76,21 +76,21 @@ def register_data_callbacks(app):
             if len(below_minimum) == 1:
                 analysis_text = html.Div([
                     html.P([
-                        html.Strong("⚠️ The following thematic area is below minimum standard:"),
+                        html.Strong("⚠️ The following thematic area does not meet the minimum standard:"),
                     ], className="text-warning mb-2"),
                     html.Ul([html.Li(area) for area in below_minimum], className="mb-0")
                 ], className="alert alert-warning")
             else:
                 analysis_text = html.Div([
                     html.P([
-                        html.Strong(f"⚠️ The following {len(below_minimum)} thematic areas are below minimum standard:"),
+                        html.Strong(f"⚠️ The following thematic areas do not meet the minimum standard:"),
                     ], className="text-warning mb-2"),
                     html.Ul([html.Li(area) for area in below_minimum], className="mb-0")
                 ], className="alert alert-warning")
         else:
             analysis_text = html.Div([
                 html.P([
-                    html.Strong("✓ Congratulations! All thematic areas meet or exceed the minimum standard."),
+                    html.Strong("✓ All thematic areas meet or exceed the minimum standard."),
                 ], className="text-success mb-0")
             ], className="alert alert-success")
         
@@ -99,6 +99,7 @@ def register_data_callbacks(app):
         
         # Generate thematic area summaries
         thematic_summaries = []
+        current_pillar = None
         for area_config in THEMATIC_AREA_QUESTIONS:
             thematic_name = area_config["thematic"]
             # Generate indicator for this thematic area
@@ -118,9 +119,21 @@ def register_data_callbacks(app):
             is_below_minimum = clean_thematic in below_minimum
             title_style = {"color": "red"} if is_below_minimum else {}
             
-            # Determine maturity level mapping from score
-            score_series = df[df["Thematic Area"] == thematic_name]["Score"]
-            score = float(score_series.iloc[0]) if not score_series.empty else 0.0
+            # Determine maturity level and pillar from score
+            area_data = df[df["Thematic Area"] == thematic_name]
+            score = float(area_data["Score"].iloc[0]) if not area_data.empty else 0.0
+            pillar_name = str(area_data["DRM Pillar"].iloc[0]) if not area_data.empty else ""
+            clean_pillar = pillar_name.split('. ', 1)[1] if '. ' in pillar_name else pillar_name
+            
+            # Add pillar header if it's a new pillar
+            if clean_pillar and clean_pillar != current_pillar:
+                thematic_summaries.append(
+                    html.Div([
+                        html.H5(clean_pillar, className="mb-0", style={"color": "#42ABEB", "fontWeight": "bold"}),
+                        html.Hr(style={"borderTop": "2px solid #42ABEB", "opacity": "1", "marginTop": "5px", "marginBottom": "15px"})
+                    ], className="mt-4")
+                )
+                current_pillar = clean_pillar
             
             if score < 0.25:
                 level_str = "Not in place"
@@ -131,7 +144,7 @@ def register_data_callbacks(app):
             elif score < 1.0:
                 level_str = "Established"
             else:
-                level_str = "Mature"
+                level_str = "Advanced"
                 
             # Use Viridis colorscale for background
             level_bg = pcolors.sample_colorscale(pcolors.sequential.Viridis, [score])[0]
@@ -162,7 +175,7 @@ def register_data_callbacks(app):
                     html.Div([
                         html.Strong(clean_thematic, style=title_style),
                         badge
-                    ], className="mb-1", style={"display": "flex", "alignItems": "center"}),
+                    ], className="mb-2", style={"display": "flex", "alignItems": "center"}),
                     unknown_alert if unknown_alert else None,
                     html.P(summary_text, className="text-muted mb-2")
                 ], className="mb-4")

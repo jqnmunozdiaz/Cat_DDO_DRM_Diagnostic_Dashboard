@@ -61,13 +61,13 @@ def generate_pillar_chart(df: pd.DataFrame) -> go.Figure:
     
     progress_fig.update_layout(
         xaxis=dict(
-            title="<b>Progress</b>",
+            title="<b>Maturity</b>",
             range=[0, 105],  # Extended slightly beyond 100 to show the 100% gridline
             showgrid=True,
             gridcolor='lightgray',
             tickmode='array',
             tickvals=[0, 25, 50, 75, 100],
-            ticktext=['-', 'Nascent', 'Emerging', 'Established', 'Mature'],
+            ticktext=['-', 'Nascent', 'Emerging', 'Established', 'Advanced'],
             fixedrange=True
         ),
         yaxis=dict(

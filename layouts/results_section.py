@@ -76,7 +76,7 @@ def get_results_section():
         
         # Summary by Thematic Area section
         html.Div([
-            html.H5("Detailed Assessment by Thematic Area", className="mb-3 mt-4"),
+            html.H5("Detailed Results by Thematic Area", className="mb-3 mt-4"),
             html.P([
                 html.I(className="fas fa-info-circle me-2"),
                 "This text was generated automatically by a Large Language Model (LLM). Users should verify the content and cross-reference with official documentation. For the purpose of generating these text summaries, 'Partially' and 'Unknown' answers are treated the same as 'No'."

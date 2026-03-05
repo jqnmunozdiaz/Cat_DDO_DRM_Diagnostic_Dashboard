@@ -73,7 +73,7 @@ def generate_figure(df_input):
         (1, '#e74c3c', 'Nascent'),      # Red
         (2, '#e67e22', 'Emerging'),      # Orange  
         (3, '#3498db', 'Established'),   # Blue
-        (4, '#27ae60', 'Mature'),        # Green
+        (4, '#27ae60', 'Advanced'),        # Green
     ]
     
     # Add reference circles as thin Barpolar rings FIRST (so they render behind data bars)
@@ -241,13 +241,13 @@ def generate_figure(df_input):
         
         # Position label just outside the bar (minimum radius of 2 for visibility)
         # Add offset to place label center outside the bar
-        label_radius = max(2, score) + 0.5
+        label_radius = max(2, score) + 0.7
         
         # Calculate marker size based on text dimensions (approximation)
         lines = display_name.split('<br>')
         max_line_chars = max(len(line) for line in lines)
         # Use max of width and height estimates for circular marker
-        marker_size = max_line_chars * 4
+        marker_size = max_line_chars * 3.8
         
         # Add white square marker as background (uses polar coordinates - will align!)
         fig.add_trace(go.Scatterpolar(
@@ -257,7 +257,7 @@ def generate_figure(df_input):
             marker=dict(
                 size=marker_size,
                 symbol='circle',
-                color='rgba(255, 255, 255, 0.9)',
+                color='rgba(255, 255, 255, 0.3)',
                 line=dict(width=0)
             ),
             showlegend=False,
@@ -271,7 +271,7 @@ def generate_figure(df_input):
             mode='text',
             text=[display_name],
             textposition='middle center',
-            textfont=dict(size=10, color=text_color, family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'),
+            textfont=dict(size=9, color=text_color, family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'),
             showlegend=False,
             hoverinfo='skip'
         ))
@@ -309,6 +309,7 @@ def generate_figure(df_input):
 
         showlegend=True,
         legend=dict(
+            title=dict(text='<b>     Maturity</b>'),
             x=1.0,
             y=1.0,
             bgcolor='rgba(255,255,255,0.9)',
