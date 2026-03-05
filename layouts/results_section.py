@@ -44,12 +44,6 @@ def get_results_section():
             " for further guidance on how to structure a context-relevant DRM policy program."
         ], className="text-muted"),
 
-        # Petal diagram (figure container)
-        html.Div(
-            id="figure-container",
-            className="text-center mb-4"
-        ),
-
         # Progress bars by pillar
         html.Div([
             html.Div([
@@ -69,12 +63,19 @@ def get_results_section():
                      style={"maxWidth": "100%", "height": "auto", "borderRadius": "8px", "boxShadow": "0 2px 8px rgba(0,0,0,0.1)"}),
             dcc.Download(id="download-pillar-image")
         ], className="mb-4"),
-        
-        # Analysis text
+
+        # Petal diagram (figure container)
+        html.Div(
+            id="figure-container",
+            className="text-center mb-4"
+        ),
+
+        # Analysis text (Warning box for areas below minimum standard)
         html.Div(id="analysis-text", className="mb-4"),
         
         # Summary by Thematic Area section
         html.Div([
+            html.H5("Detailed Assessment by Thematic Area", className="mb-3 mt-4"),
             html.P([
                 html.I(className="fas fa-info-circle me-2"),
                 "This text was generated automatically by a Large Language Model (LLM). Users should verify the content and cross-reference with official documentation. For the purpose of generating these text summaries, 'Partially' and 'Unknown' answers are treated the same as 'No'."

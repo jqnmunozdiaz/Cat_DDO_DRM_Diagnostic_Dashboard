@@ -12,7 +12,7 @@ from utils.data_parser import parse_pasted_data
 from utils.thematic_helpers import generate_answer_indicator, load_thematic_summary
 from scripts.petal_chart_figure_generator import generate_figure
 from scripts.pillar_chart import generate_pillar_chart
-from config.question_config import THEMATIC_AREA_QUESTIONS
+from config.question_config import THEMATIC_AREA_QUESTIONS, parse_question_range
 
 
 def register_data_callbacks(app):
@@ -76,23 +76,21 @@ def register_data_callbacks(app):
             if len(below_minimum) == 1:
                 analysis_text = html.Div([
                     html.P([
-                        html.Strong("⚠️ Areas Below Minimum Standard:"),
-                        html.Br(),
-                        f"The following area does not meet the minimum standard: "
+                        html.Strong("⚠️ The following thematic area is below minimum standard:"),
                     ], className="text-warning mb-2"),
                     html.Ul([html.Li(area) for area in below_minimum], className="mb-0")
                 ], className="alert alert-warning")
             else:
                 analysis_text = html.Div([
                     html.P([
-                        html.Strong(f"⚠️ The following {len(below_minimum)} areas do not meet the minimum standard:"),
+                        html.Strong(f"⚠️ The following {len(below_minimum)} thematic areas are below minimum standard:"),
                     ], className="text-warning mb-2"),
                     html.Ul([html.Li(area) for area in below_minimum], className="mb-0")
                 ], className="alert alert-warning")
         else:
             analysis_text = html.Div([
                 html.P([
-                    html.Strong("✓ Congratulations! All assessed areas meet or exceed the minimum standard."),
+                    html.Strong("✓ Congratulations! All thematic areas meet or exceed the minimum standard."),
                 ], className="text-success mb-0")
             ], className="alert alert-success")
         
@@ -143,14 +141,31 @@ def register_data_callbacks(app):
                 
             badge = html.Span(level_str, className="badge ms-2", style={"backgroundColor": level_bg, "color": level_text_color, "fontSize": "0.8em", "fontWeight": "normal", "verticalAlign": "middle", "border": "1px solid rgba(0,0,0,0.1)"})
             
+            # Check for unknown answers
+            area_question_ids = parse_question_range(area_config["questions"])
+            total_questions = len(area_question_ids)
+            unknown_count = sum(
+                1 for q_id in area_question_ids 
+                if q_id in question_data and question_data[q_id]["answer"].lower() == "unknown"
+            )
+            
+            # If 50% or more are unknown, create a warning alert
+            unknown_alert = None
+            if total_questions > 0 and (unknown_count / total_questions) >= 0.5:
+                unknown_alert = html.Div([
+                    html.I(className="fas fa-exclamation-triangle me-2"),
+                    f"High number of 'Unknown' answers ({unknown_count}/{total_questions}). Follow-up recommended."
+                ], className="text-warning fw-bold", style={"fontSize": "0.9em", "marginBottom": "5px"})
+
             thematic_summaries.append(
                 html.Div([
-                    html.P([
+                    html.Div([
                         html.Strong(clean_thematic, style=title_style),
                         badge
-                    ], className="mb-2", style={"display": "flex", "alignItems": "center"}),
-                    html.P(summary_text, className="text-muted")
-                ], className="mb-3")
+                    ], className="mb-1", style={"display": "flex", "alignItems": "center"}),
+                    unknown_alert if unknown_alert else None,
+                    html.P(summary_text, className="text-muted mb-2")
+                ], className="mb-4")
             )
         
         # Generate circular figure (Plotly)

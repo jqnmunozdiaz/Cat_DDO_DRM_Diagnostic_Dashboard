@@ -182,18 +182,18 @@ def generate_figure(df_input):
     
     # Add pillar group labels
     title_texts = [
-        'Legal and<br>Institutional<br>DRM Framework', 
-        'Risk<br>Identification', 
-        'Risk<br>Reduction',
-        'Preparedness', 
-        'Financial<br>Protection', 
-        'Resilient<br>Reconstruction'
+        '<b>Legal and<br>Institutional<br>DRM Framework</b>', 
+        '<b>Risk<br>Identification</b>', 
+        '<b>Risk<br>Reduction</b>',
+        '<b>Preparedness</b>', 
+        '<b>Financial<br>Protection</b>', 
+        '<b>Resilient<br>Reconstruction</b>'
     ]
     
     for i, (pillar, (start_idx, end_idx, theta_start, theta_end)) in enumerate(group_positions.items()):
         mid_angle = (theta_start + theta_end) / 2
         # Position labels outside the chart
-        label_radius = 5.9
+        label_radius = 6.3
         x_pos = 0.5 + (label_radius * scale_factor) * np.cos(np.radians(90 - mid_angle))
         y_pos = 0.5 + (label_radius * scale_factor) * np.sin(np.radians(90 - mid_angle))
 
@@ -206,7 +206,7 @@ def generate_figure(df_input):
             y=y_pos,
             text=title_texts[i],
             showarrow=False,
-            font=dict(size=10, color='#333', family='Arial Black'),
+            font=dict(size=12, color='#333', family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'),
             align='center',
             xref='paper',
             yref='paper'
@@ -247,7 +247,7 @@ def generate_figure(df_input):
         lines = display_name.split('<br>')
         max_line_chars = max(len(line) for line in lines)
         # Use max of width and height estimates for circular marker
-        marker_size = max_line_chars * 3
+        marker_size = max_line_chars * 4
         
         # Add white square marker as background (uses polar coordinates - will align!)
         fig.add_trace(go.Scatterpolar(
@@ -271,7 +271,7 @@ def generate_figure(df_input):
             mode='text',
             text=[display_name],
             textposition='middle center',
-            textfont=dict(size=8, color=text_color, family='Arial'),
+            textfont=dict(size=10, color=text_color, family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'),
             showlegend=False,
             hoverinfo='skip'
         ))
