@@ -6,6 +6,7 @@ from dash import html, dcc, Input, Output, State
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.colors as pcolors
 
 from utils.data_parser import parse_pasted_data
 from utils.thematic_helpers import generate_answer_indicator, load_thematic_summary
@@ -119,10 +120,36 @@ def register_data_callbacks(app):
             is_below_minimum = clean_thematic in below_minimum
             title_style = {"color": "red"} if is_below_minimum else {}
             
+            # Determine maturity level mapping from score
+            score_series = df[df["Thematic Area"] == thematic_name]["Score"]
+            score = float(score_series.iloc[0]) if not score_series.empty else 0.0
+            
+            if score < 0.25:
+                level_str = "Not in place"
+            elif score < 0.50:
+                level_str = "Nascent"
+            elif score < 0.75:
+                level_str = "Emerging"
+            elif score < 1.0:
+                level_str = "Established"
+            else:
+                level_str = "Mature"
+                
+            # Use Viridis colorscale for background
+            level_bg = pcolors.sample_colorscale(pcolors.sequential.Viridis, [score])[0]
+            
+            # Use darker text color for lighter backgrounds (high scores in Viridis scale)
+            level_text_color = "black" if score >= 0.75 else "white"
+                
+            badge = html.Span(level_str, className="badge ms-2", style={"backgroundColor": level_bg, "color": level_text_color, "fontSize": "0.8em", "fontWeight": "normal", "verticalAlign": "middle", "border": "1px solid rgba(0,0,0,0.1)"})
+            
             thematic_summaries.append(
                 html.Div([
-                html.P(html.Strong(clean_thematic, style=title_style), className="mb-2"),
-                html.P(summary_text, className="text-muted")
+                    html.P([
+                        html.Strong(clean_thematic, style=title_style),
+                        badge
+                    ], className="mb-2", style={"display": "flex", "alignItems": "center"}),
+                    html.P(summary_text, className="text-muted")
                 ], className="mb-3")
             )
         

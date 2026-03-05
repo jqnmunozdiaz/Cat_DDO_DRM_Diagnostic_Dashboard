@@ -77,7 +77,7 @@ def get_results_section():
         html.Div([
             html.P([
                 html.I(className="fas fa-info-circle me-2"),
-                "This text was generated automatically by a Large Language Model (LLM). Users should verify the content and cross-reference with official documentation."
+                "This text was generated automatically by a Large Language Model (LLM). Users should verify the content and cross-reference with official documentation. For the purpose of generating these text summaries, 'Partially' and 'Unknown' answers are treated the same as 'No'."
             ], className="text-muted fst-italic small mb-3", style={"backgroundColor": "#fff3cd", "padding": "10px", "borderRadius": "5px", "border": "1px solid #ffc107"})
         ]),
         

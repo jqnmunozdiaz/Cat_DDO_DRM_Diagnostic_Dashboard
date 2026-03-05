@@ -26,21 +26,22 @@ def generate_answer_indicator(question_data, thematic_area):
 def load_thematic_summary(thematic_area, indicator):
     """Load LLM-generated summary from JSON file based on thematic area and answer indicator"""
     try:
-        # Special handling for 3.3 which has 10 questions split into 2 parts
-        if thematic_area == "3.3. Sector-specific risk reduction measures" and len(indicator) == 10:
-            # Split indicator into two parts: first 5 and last 5 questions
-            indicator_part1 = indicator[:5]
-            indicator_part2 = indicator[5:]
+        json_file_part1 = Path("LLM") / f"{thematic_area}_part1.json"
+        
+        # Check if this thematic area has multiple parts
+        if json_file_part1.exists():
+            with open(json_file_part1, 'r', encoding='utf-8') as f:
+                summaries_part1 = json.load(f)
+                
+            # Determine split index dynamically from the length of keys in part 1
+            split_index = len(next(iter(summaries_part1.keys()))) if summaries_part1 else len(indicator) // 2
             
-            # Load from part1 JSON
-            json_file_part1 = Path("LLM") / f"{thematic_area}_part1.json"
-            summary_part1 = "Summary for part 1 will be available soon."
-            if json_file_part1.exists():
-                with open(json_file_part1, 'r', encoding='utf-8') as f:
-                    summaries_part1 = json.load(f)
-                summary_part1 = summaries_part1.get(indicator_part1, "Summary content for this response pattern will be available soon.")
+            indicator_part1 = indicator[:split_index]
+            indicator_part2 = indicator[split_index:]
             
-            # Load from part2 JSON
+            summary_part1 = summaries_part1.get(indicator_part1, "Summary content for this response pattern will be available soon.")
+            
+            # Load part 2
             json_file_part2 = Path("LLM") / f"{thematic_area}_part2.json"
             summary_part2 = "Summary for part 2 will be available soon."
             if json_file_part2.exists():

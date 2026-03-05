@@ -39,4 +39,4 @@ COUNTRIES = [
 ]
 
 # Example diagnostic data for demonstration purposes
-EXAMPLE_DATA = "Q1;Yes;1&Q2;Partially;1&Q3;Yes;1&Q4;Yes;1&Q5;Unknown;1&Q6;Yes;1&Q7;No;1&Q8;Partially;1&Q9;No;1&Q10;Yes;1&Q11;Yes;1&Q12;Yes;1&Q13;No;1&Q14;Yes;1&Q15;Yes;1&Q16;No;1&Q17;Yes;1&Q18;Partially;0.25&Q19;Yes;0.25&Q20;Yes;0.25&Q21;Yes;0.25&Q22;Unknown;1&Q23;No;1&Q24;No;1&Q25;No;1&Q26;Yes;1&Q27;Yes;1&Q28;No;1&Q29;No;1&Q30;Yes;1&Q31;Partially;1&Q32;Yes;1&Q33;Yes;1&Q34;No;1&Q35;Yes;1&Q36;No;1&Q37;Yes;1&Q38;No;1&Q39;No;1&Q40;Yes;1&Q41;Yes;1&Q42;Unknown;1&Q43;No;1&Q44;No;1&Q45;No;1&Q46;Yes;1&Q47;Yes;1"
+EXAMPLE_DATA = "Q1;Yes;1&Q2;Partially;1&Q3;Yes;1&Q4;Yes;1&Q5;Unknown;1&Q6;Yes;1&Q7;No;1&Q8;Partially;1&Q9;No;1&Q10;Yes;1&Q11;Yes;1&Q12;Yes;1&Q13;No;1&Q14;Yes;1&Q15;Yes;1&Q16;No;1&Q17;Yes;1&Q18;Partially;0.25&Q19;Yes;0.25&Q20;Yes;0.25&Q21;Yes;0.25&Q22;Unknown;1&Q23;No;1&Q24;No;1&Q25;No;1&Q26;Yes;1&Q27;Yes;1&Q28;No;1&Q29;No;1&Q30;Yes;1&Q31;Partially;1&Q32;Yes;1&Q33;Yes;1&Q34;No;1&Q35;Yes;1&Q36;No;1&Q37;Yes;1&Q38;No;1&Q39;No;1&Q40;Yes;1&Q41;Yes;1&Q42;Unknown;1&Q43;No;1&Q44;No;1&Q45;No;1&Q46;Yes;1"
