@@ -69,9 +69,3 @@ with open(output_file, 'w', encoding='utf-8') as f:
 print(f"\nSuccessfully extracted {question_counter - 1} questions across {len(questions_dict)} thematic areas")
 print(f"JSON file saved to: {output_file}")
 
-# Display sample output
-print(f"\nSample output:")
-for thematic_area, questions in list(questions_dict.items())[:2]:
-    print(f'\n{thematic_area}:')
-    for q_id, q_text in list(questions.items())[:2]:
-        print(f'  {q_id}: "{q_text[:60]}..."')
