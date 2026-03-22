@@ -196,7 +196,7 @@ def register_data_callbacks(app):
                         'responsive': True,
                         'displayModeBar': True,
                         'displaylogo': False,
-                        'modeBarButtonsToRemove': ['lasso2d', 'select2d', 'zoom2d', 'pan2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
+                        'modeBarButtonsToRemove': ['toImage', 'lasso2d', 'select2d', 'zoom2d', 'pan2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
                         'toImageButtonOptions': {
                             'format': 'png', 
                             'filename': 'DRM_Assessment_Result',

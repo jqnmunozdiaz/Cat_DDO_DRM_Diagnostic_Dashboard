@@ -112,7 +112,8 @@ def generate_figure(df_input):
         
         for idx, row in df.iterrows():
             angle = row["angle"]
-            height = row["Score"]
+            # Ensure a minimum height for visibility (hole is 0.35)
+            height = max(row["Score"], 0.4) if row["Score"] > 0 else 0
             
             if height > 0:
                 segment_height = height / n_segments

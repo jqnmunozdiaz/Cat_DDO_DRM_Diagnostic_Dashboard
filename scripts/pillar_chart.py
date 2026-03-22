@@ -76,7 +76,7 @@ def generate_pillar_chart(df: pd.DataFrame) -> go.Figure:
             fixedrange=True
         ),
         height=max(300, len(pillars) * 60),
-        margin=dict(l=80, r=220, t=20, b=60),
+        margin=dict(l=80, r=120, t=20, b=60),
         plot_bgcolor='white',
         paper_bgcolor='white',
         font=dict(size=12)
