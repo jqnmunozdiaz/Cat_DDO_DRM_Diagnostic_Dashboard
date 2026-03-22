@@ -92,8 +92,7 @@ def get_results_section():
                 [html.I(className="fas fa-download me-2"), "Download Results"],
                 id="download-results-pdf-bottom",
                 color="primary",
-                size="sm",
-                className="mt-0"
+                className="mt-0 me-2"
             ),
         ], className="mb-4 text-end")
     ], id="results-section", style={"display": "none"})
