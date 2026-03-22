@@ -155,7 +155,7 @@ def generate_figure(df_input):
             line=dict(color='lightgray', width=1, dash='solid'),
             showlegend=False,
             hoverinfo='skip',
-            opacity=0.5
+            opacity=1
         ))
     
     # Add invisible traces for legend (shapes don't appear in legend)
@@ -199,14 +199,19 @@ def generate_figure(df_input):
 
         # Manual adjustment for "Legal and Institutional" (index 0)
         if i == 0:
-            x_pos += 0.03
+            x_pos += 0.09
+
+        # Manual adjustment for "Risk Identification" (index 1)
+        if i == 1:
+            x_pos += 0.07
+            y_pos += 0.04
         
         fig.add_annotation(
             x=x_pos,
             y=y_pos,
             text=title_texts[i],
             showarrow=False,
-            font=dict(size=12, color='#333', family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'),
+            font=dict(size=14, color='#333', family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'),
             align='center',
             xref='paper',
             yref='paper'
@@ -271,7 +276,7 @@ def generate_figure(df_input):
             mode='text',
             text=[display_name],
             textposition='middle center',
-            textfont=dict(size=9, color=text_color, family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'),
+            textfont=dict(size=11, color=text_color, family='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'),
             showlegend=False,
             hoverinfo='skip'
         ))
@@ -324,7 +329,7 @@ def generate_figure(df_input):
         plot_bgcolor='white',  # Set plot area background to white
         autosize=True,  # Responsive width
         height=800,  # Increased height
-        margin=dict(l=140, r=220, t=40, b=40),
+        margin=dict(l=140, r=150, t=40, b=20),
         dragmode=False  # Disable zoom/pan
     )
     
