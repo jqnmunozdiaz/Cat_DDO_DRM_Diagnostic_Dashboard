@@ -84,5 +84,16 @@ def get_results_section():
         ]),
         
         # Dynamic summaries container
-        html.Div(id="thematic-summaries-container", className="mb-4")
+        html.Div(id="thematic-summaries-container", className="mb-4"),
+
+        # Bottom download button
+        html.Div([
+            dbc.Button(
+                [html.I(className="fas fa-download me-2"), "Download Results"],
+                id="download-results-pdf-bottom",
+                color="primary",
+                size="sm",
+                className="mt-0"
+            ),
+        ], className="mb-4 text-end")
     ], id="results-section", style={"display": "none"})
