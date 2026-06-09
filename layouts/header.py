@@ -23,7 +23,7 @@ def get_header():
                 html.H1([
                     "Evaluating DRM Policy Frameworks:",
                     html.Br(),
-                    "A Rapid Screening Tool"
+                    "A DRM Policy Diagnostic Tool"
                 ], className="mb-2 text-center"),
                 html.P(
                     "Evaluate a country's policy and institutional setting for Disaster Risk Management across six critical pillars",
