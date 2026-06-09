@@ -2,8 +2,6 @@
 
 A web-based dashboard for evaluating a country's institutional setting for Disaster Risk Management (DRM) across six critical pillars.
 
-## 🌐 Live Demo
-[Add your Render URL here after deployment]
 
 ## 📋 Features
 
