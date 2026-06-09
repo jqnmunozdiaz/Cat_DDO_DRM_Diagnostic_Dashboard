@@ -28,11 +28,6 @@ def get_header():
                 html.P(
                     "Evaluate a country's policy and institutional setting for Disaster Risk Management across six critical pillars",
                     className="text-center text-muted mb-4 lead"
-                ),
-                dbc.Alert(
-                    [html.B("Prototype"), ": this will be updated following test cases. Your feedback is welcomed."],
-                    color="info",
-                    className="mb-4 text-center"
                 )
             ], width=12)
         ]),
