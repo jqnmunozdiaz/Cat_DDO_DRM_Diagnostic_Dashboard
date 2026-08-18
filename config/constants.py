@@ -11,7 +11,7 @@ COUNTRIES = [
     "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria",
     "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada",
     "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros",
-    "Congo (Republic of)", "Congo (DRC)", "Costa Rica", "Croatia", "Cuba",
+    "Congo (Republic of)", "Congo (DRC)", "Costa Rica", "Côte d'Ivoire", "Croatia", "Cuba",
     "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic",
     "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia",
     "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia",
