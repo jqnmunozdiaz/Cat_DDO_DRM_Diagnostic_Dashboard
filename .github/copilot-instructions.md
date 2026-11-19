@@ -58,10 +58,9 @@ python app.py
 # App runs on localhost:8050 in debug mode (unless RENDER env var set)
 ```
 
-**Deploying to Render** (current platform):
-- Uses [Procfile](Procfile): `web: gunicorn app:server`
-- Python 3.11.7 specified in [runtime.txt](runtime.txt)
-- Auto-deploys on git push to main branch
+**Deploying to Google Cloud Run** (current platform):
+- A Cloud Build trigger in GCP project `drm-diagnostic-tool` builds the [Dockerfile](../Dockerfile) on every push to `main`
+- Deploys to Cloud Run service `cat-ddo-drm-diagnostic-dashboard` (us-central1), started with `gunicorn app:server`
 - No environment variables required
 
 **Understanding the calculation logic**:

@@ -42,13 +42,15 @@ A web-based dashboard for evaluating a country's institutional and policy settin
 
 ---
 
-## 🌐 Deployment (Render)
+## 🌐 Deployment (Google Cloud Run)
 
-Render automatically deploys when you push changes to your GitHub repository.
+Live at: https://cat-ddo-drm-diagnostic-dashboard-129737065802.us-central1.run.app
 
-- **Runtime**: `Python 3`
-- **Build Command**: `pip install -r requirements.txt`
-- **Start Command**: `gunicorn app:server`
+Every push to `main` triggers a Cloud Build trigger in the `drm-diagnostic-tool` Google Cloud project, which builds the [Dockerfile](Dockerfile) and deploys it to the Cloud Run service `cat-ddo-drm-diagnostic-dashboard` (region `us-central1`).
+
+- **Image**: `python:3.11-slim`, dependencies from `requirements.txt`
+- **Start Command**: `gunicorn --bind 0.0.0.0:$PORT app:server`
+- **Build status**: Google Cloud console → Cloud Build → History (not GitHub Actions)
 
 ---
 
