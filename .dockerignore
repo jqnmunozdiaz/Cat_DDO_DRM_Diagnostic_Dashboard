@@ -25,7 +25,5 @@ Thumbs.db
 
 # Project specific
 _old/
-deploy_log.txt
-.gcloudignore
 Dockerfile
 .dockerignore

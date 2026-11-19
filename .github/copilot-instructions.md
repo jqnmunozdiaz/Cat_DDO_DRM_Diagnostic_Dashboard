@@ -125,7 +125,7 @@ All callbacks use `prevent_initial_call=True` to avoid execution on page load. K
 - `kaleido>=0.2.1` - Required for Plotly figure-to-image conversion (used in pillar download)
 - `matplotlib>=3.8.0` - 'Agg' backend for headless rendering
 
-**Why gunicorn**: Dash's built-in Flask server not production-ready; gunicorn provides WSGI server for Render deployment.
+**Why gunicorn**: Dash's built-in Flask server not production-ready; gunicorn provides the WSGI server in the Docker image deployed to Cloud Run.
 
 ## Known Limitations
 - No authentication or user accounts
@@ -156,5 +156,5 @@ All callbacks use `prevent_initial_call=True` to avoid execution on page load. K
 | [scripts/figure_generator.py](scripts/figure_generator.py) | Polar chart logic | Adjusting visualization design |
 | [data/DRM System Diagnostic Assessment - Template.xlsx](data/DRM%20System%20Diagnostic%20Assessment%20-%20Template.xlsx) | User-facing template | Changing pillars/questions |
 | [assets/css/app.css](assets/css/app.css) | Custom styling | UI appearance changes |
-| [Procfile](Procfile) | Deployment config | Switching WSGI server |
+| [Dockerfile](../Dockerfile) | Cloud Run container (gunicorn start command) | Changing Python version or WSGI server |
 | [requirements.txt](requirements.txt) | Dependencies | Adding packages |
