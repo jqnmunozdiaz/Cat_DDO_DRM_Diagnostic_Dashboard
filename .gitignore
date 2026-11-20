@@ -132,10 +132,19 @@ Thumbs.db
 # Application specific - generated files only
 DRM_Assessment_Chart.png
 
-# Old/archived files
-data/_old/
-*/_old/
+# Old/archived files (any depth)
+**/_old/
 
 # But keep assets (logos, etc.)
 !assets/**/*.png
 !assets/**/*.jpg
+
+# Local-only files (kept on disk, not shared on GitHub)
+*.code-workspace
+.github/copilot-instructions.md
+assets/images/horizontal_bar_viridis.png
+data/Country Results/
+data/DRM Diagnostic Tools - Phase 1 and 2 - revised+ private sector.xlsx
+data/DRM diagnostic tool phases 1 and 2 (AFW revised).xlsx
+data/PHASE 1 - DRM Diagnostic Tools.xlsx
+data/PHASE 2 - DRM Rapid Screening Tool - Questionnaire.xlsx

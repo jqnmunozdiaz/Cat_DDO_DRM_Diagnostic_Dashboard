@@ -1,81 +1,44 @@
-# Evaluating DRM Policy Frameworks: A DRM Policy Diagnostic Tool
+# DRM Policy Diagnostic Tool
 
-A web-based dashboard for evaluating a country's institutional and policy setting for Disaster Risk Management (DRM) across six critical pillars.
+A web dashboard that evaluates a country's Disaster Risk Management (DRM) policy and institutional framework across six pillars and twelve thematic areas.
 
----
+**Live app:** https://cat-ddo-drm-diagnostic-dashboard-129737065802.us-central1.run.app
 
-## 📋 Features
+## How it works
 
-- **Interactive Assessment**: Copy-paste structured diagnostic data to instantly visualize results.
-- **Visual Analytics**: Generates circular polar (petal) charts showing DRM system strengths and gaps.
-- **Data Export**: Easily download high-quality assessment charts as PNG images.
-- **Clean Responsive UI**: Designed with bootstrap for seamless mobile and desktop use.
+1. Download and fill in the questionnaire (`data/DRM Rapid Screening Tool - Questionnaire.xlsx`).
+2. Paste the results string from the questionnaire into the app.
+3. The app shows a petal chart by thematic area, a progress chart by pillar, and short text summaries for each area. You can save the results as a PDF.
 
----
+## Run it locally
 
-## 🚀 Quick Start
+Requires Python 3.11+.
 
-### Prerequisites
-- Python 3.11+
+```bash
+git clone https://github.com/jqnmunozdiaz/Cat_DDO_DRM_Diagnostic_Dashboard.git
+cd Cat_DDO_DRM_Diagnostic_Dashboard
+pip install -r requirements.txt
+python app.py
+```
 
-### Installation & Run
+Then open http://localhost:8050.
 
-1. Clone the repository and navigate to the project directory:
-   ```bash
-   git clone https://github.com/jqnmunozdiaz/Cat_DDO_DRM_Diagnostic_Dashboard.git
-   cd Cat_DDO_DRM_Diagnostic_Dashboard
-   ```
+## Project structure
 
-2. Set up a virtual environment and install dependencies:
-   ```bash
-   python -m venv venv
-   # Activate:
-   # Windows: venv\Scripts\activate | macOS/Linux: source venv/bin/activate
-   pip install -r requirements.txt
-   ```
+- `app.py`: entry point.
+- `layouts/`: page sections (header, input, results).
+- `callbacks/`: data processing, charts and downloads.
+- `config/`: question-to-pillar mapping and constants.
+- `utils/`: input parsing and summary helpers.
+- `scripts/`: chart generators, plus the script that extracts questions from the Excel file for the LLM summaries.
+- `LLM/`: pre-generated text summaries for each thematic area.
+- `data/`: the questionnaire users fill in.
+- `assets/`: CSS, logos, framework image and the methodological note (PDF and Word).
 
-3. Run the app:
-   ```bash
-   python app.py
-   ```
-   Open [http://localhost:8050](http://localhost:8050) in your browser.
+## Deployment
 
----
+Every push to `main` rebuilds the [Dockerfile](Dockerfile) and deploys it to Google Cloud Run (project `drm-diagnostic-tool`, service `cat-ddo-drm-diagnostic-dashboard`, region `us-central1`).
 
-## 🌐 Deployment (Google Cloud Run)
+## Credits
 
-Live at: https://cat-ddo-drm-diagnostic-dashboard-129737065802.us-central1.run.app
-
-Every push to `main` triggers a Cloud Build trigger in the `drm-diagnostic-tool` Google Cloud project, which builds the [Dockerfile](Dockerfile) and deploys it to the Cloud Run service `cat-ddo-drm-diagnostic-dashboard` (region `us-central1`).
-
-- **Image**: `python:3.11-slim`, dependencies from `requirements.txt`
-- **Start Command**: `gunicorn --bind 0.0.0.0:$PORT app:server`
-- **Build status**: Google Cloud console → Cloud Build → History (not GitHub Actions)
-
----
-
-## 🏗️ Project Structure
-
-- `app.py`: Main entry point for the Dash application.
-- `layouts/`: Contains UI layout sections (header, input, results).
-- `callbacks/`: Handles user interactions, data parsing, and image download triggers.
-- `config/`: Contains the question mappings and country lists.
-- `data/`: Holds the offline diagnostic spreadsheet template (`DRM Rapid Screening Tool - Questionnaire.xlsx`).
-- `LLM/`: JSON files containing response pattern narrative summaries.
-
----
-
-## 📊 Assessment Pillars
-
-1. **Legal and Institutional DRM Framework**: DRM policies, institutions, and development plan integration.
-2. **Risk Identification**: Geospatial and hazard risk data management.
-3. **Risk Reduction**: Urban planning, central public investments, and sector-specific design standards.
-4. **Preparedness**: Early warning systems, emergency response protocols, and adaptive social protection.
-5. **Financial Protection**: Fiscal risk management, sovereign risk finance strategies, and catastrophe insurance.
-6. **Resilient Reconstruction**: Post-disaster recovery planning and build-back-better zoning.
-
----
-
-## 👥 Contributors & Support
-
-- Developed by the **World Bank Group** and the **Global Facility for Disaster Reduction and Recovery (GFDRR)**.
+Developed by the World Bank Group and the Global Facility for Disaster Reduction and Recovery (GFDRR).
